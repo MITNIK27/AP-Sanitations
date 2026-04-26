@@ -29,6 +29,36 @@ export const leadSchema = defineType({
       type: 'datetime',
       title: 'Submitted At',
     }),
+    defineField({
+      name: 'name',
+      type: 'string',
+      title: 'Name',
+      description: 'Provided via optional enrichment form after phone submission',
+    }),
+    defineField({
+      name: 'email',
+      type: 'string',
+      title: 'Email',
+      description: 'Provided via optional enrichment form after phone submission',
+    }),
+    defineField({
+      name: 'productInterest',
+      type: 'string',
+      title: 'Product Interest',
+      description: 'Category the customer is interested in',
+      options: {
+        list: [
+          { title: 'Wellness & Spa', value: 'wellness-spa' },
+          { title: 'Pure Life (Water Purifiers)', value: 'pure-life' },
+          { title: 'Kitchen Harmony', value: 'kitchen-harmony' },
+          { title: 'Swimming Pool Systems', value: 'swimming-pool' },
+          { title: 'Invisible Infrastructure', value: 'invisible-infrastructure' },
+          { title: 'Shower Systems', value: 'shower-systems' },
+          { title: 'Bathroom Faucets', value: 'bathroom-faucets' },
+          { title: 'Bathtubs', value: 'bathtubs' },
+        ],
+      },
+    }),
   ],
   orderings: [
     {
@@ -38,6 +68,6 @@ export const leadSchema = defineType({
     },
   ],
   preview: {
-    select: { title: 'phone', subtitle: 'source' },
+    select: { title: 'phone', subtitle: 'name' },
   },
 })

@@ -6,6 +6,7 @@ import Image from "next/image";
 import { APLogo } from "@/components/APLogo";
 import type { Brand } from "@/data/brands";
 import type { Product } from "@/data/products";
+import { WA_NUMBER } from '@/lib/whatsapp'
 
 // ─── Shared Animation Variants ────────────────────────────────────────────────
 
@@ -111,13 +112,16 @@ function Navbar() {
       variants={fadeIn}
       initial="hidden"
       animate="visible"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-600 ${
-        scrolled
-          ? "bg-cream/95 backdrop-blur-sm border-b border-gold/20"
-          : "bg-transparent"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50"
     >
-      <div className="container-wide">
+      {/* Cream background — fades in on scroll via opacity so backdrop-blur doesn't snap */}
+      <div
+        className={`absolute inset-0 bg-cream/95 backdrop-blur-sm border-b border-gold/20 transition-opacity duration-700 ease-luxury ${
+          scrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      <div className="container-wide relative z-10">
         <div className="flex items-center justify-between h-16 md:h-20">
 
           {/* Logo */}
@@ -136,7 +140,7 @@ function Navbar() {
                 key={link.label}
                 href={link.href}
                 className={`link-underline transition-colors duration-400 ${
-                  scrolled ? "text-charcoal" : "text-charcoal/70 hover:text-charcoal"
+                  scrolled ? "text-charcoal" : "text-cream/70 hover:text-cream"
                 }`}
               >
                 {link.label}
@@ -207,40 +211,57 @@ function Hero() {
       id="home"
       className="relative flex min-h-screen flex-col md:flex-row overflow-hidden bg-charcoal"
     >
-      {/* Left — Atmospheric image (placeholder: replace with showroom/product photo) */}
-      {/* TODO: Replace this div with <Image> from next/image once real photo is provided */}
+      {/* Top scrim — covers only the image panel, ensures logo/nav always readable */}
+      <div className="absolute top-0 left-0 md:right-[45%] right-0 h-36 bg-gradient-to-b from-charcoal/70 to-transparent pointer-events-none z-10" />
+
+      {/* Left — Framed showroom gallery */}
       <motion.div
         variants={slideFromLeft}
         initial="hidden"
         animate="visible"
-        className="relative w-full md:w-[55%] min-h-[50vh] md:min-h-screen grain flex-shrink-0"
-        style={{
-          background:
-            "linear-gradient(160deg, #3D6B65 0%, #2A4D49 45%, #1A1914 100%)",
-        }}
+        className="w-full md:w-[55%] min-h-[50vh] md:min-h-screen flex-shrink-0 flex flex-col gap-3 p-5 md:p-8 grain"
       >
-        {/* Subtle texture overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse at 30% 60%, rgba(61,107,101,0.4) 0%, transparent 65%)",
-          }}
-        />
+        {/* Top frame — Showroom 1 */}
+        <div className="relative flex-1 overflow-hidden rounded-sm ring-1 ring-gold/25">
+          <Image
+            src="/pics/Showroom1.jpeg"
+            alt="AP Sanitations showroom"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 55vw"
+            className="object-cover"
+          />
+          {/* Top-to-bottom gradient so logo area is dark, fades to reveal image mid-way */}
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal/55 via-transparent to-charcoal/35 pointer-events-none" />
+        </div>
 
-        {/* Placeholder label — remove when real image is added */}
-        <div className="absolute bottom-6 left-6 label text-cream/30">
-          {/* Showroom / product photograph */}
+        {/* Bottom frame — Showroom 2 */}
+        <div className="relative flex-1 overflow-hidden rounded-sm ring-1 ring-gold/25">
+          <Image
+            src="/pics/Sofpour.jpg"
+            alt="AP Sanitations showroom products"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 55vw"
+            className="object-cover brightness-[0.88] saturate-[1.2]"
+          />
+          {/* Stronger vignette to contain the industrial colours */}
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal/35 via-transparent to-charcoal/60 pointer-events-none" />
         </div>
       </motion.div>
 
       {/* Right — Editorial text */}
-      <div className="flex w-full md:w-[45%] items-center bg-cream px-8 md:px-12 lg:px-16 py-24 md:py-0">
+      <div className="relative flex w-full md:w-[45%] items-center px-8 md:px-12 lg:px-16 py-24 md:py-0 md:border-l md:border-white/[0.06]">
+        {/* Subtle teal atmospheric glow — ties back to the brand's green heritage */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 60% 30%, rgba(61,107,101,0.11) 0%, transparent 65%)' }}
+        />
         <motion.div
           variants={stagger}
           initial="hidden"
           animate="visible"
-          className="max-w-md"
+          className="max-w-md relative"
         >
           {/* Label */}
           <motion.p variants={fadeUp} className="label mb-6">
@@ -250,7 +271,7 @@ function Hero() {
           {/* Headline */}
           <motion.h1
             variants={fadeUp}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] leading-[1.05] text-charcoal mb-6"
+            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] leading-[1.05] text-cream mb-6"
           >
             To elevate every space with smart, sustainable, and luxurious water solutions.
           </motion.h1>
@@ -267,7 +288,7 @@ function Hero() {
           <motion.div variants={fadeUp}>
             <a
               href="#brands"
-              className="cta-ghost text-charcoal hover:text-gold"
+              className="cta-ghost text-cream/70 hover:text-gold"
             >
               <span>Explore</span>
               <IconArrow />
@@ -688,6 +709,16 @@ function ShowroomCTA() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+  // Enrichment form state
+  const [leadId, setLeadId] = useState<string | null>(null);
+  const [enriched, setEnriched] = useState(false);
+  const [enrichSubmitted, setEnrichSubmitted] = useState(false);
+  const [enrichSubmitting, setEnrichSubmitting] = useState(false);
+  const [enrichName, setEnrichName] = useState("");
+  const [enrichEmail, setEnrichEmail] = useState("");
+  const [enrichEmailError, setEnrichEmailError] = useState("");
+  const [enrichProduct, setEnrichProduct] = useState("");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const cleaned = phone.replace(/\D/g, "");
@@ -704,6 +735,8 @@ function ShowroomCTA() {
         body: JSON.stringify({ phone: cleaned, source: "contact-form", whatsappOptIn }),
       });
       if (!res.ok) throw new Error("Server error");
+      const data = await res.json();
+      setLeadId(data.leadId ?? null);
       setSubmitted(true);
     } catch {
       setError("Something went wrong. Please call us directly.");
@@ -712,8 +745,41 @@ function ShowroomCTA() {
     }
   }
 
+  async function handleEnrich() {
+    if (!leadId) { setEnriched(true); return; }
+
+    const payload: Record<string, string> = {};
+    if (enrichName.trim())    payload.name = enrichName.trim();
+    if (enrichEmail.trim())   payload.email = enrichEmail.trim();
+    if (enrichProduct)        payload.productInterest = enrichProduct;
+
+    if (Object.keys(payload).length === 0) { setEnriched(true); return; }
+
+    if (enrichEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(enrichEmail.trim())) {
+      setEnrichEmailError("Please enter a valid email address.");
+      return;
+    }
+    setEnrichEmailError("");
+    setEnrichSubmitting(true);
+    try {
+      await fetch("/api/leads", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leadId, ...payload }),
+      });
+      setEnrichSubmitted(true);
+    } catch {
+      // silently ignore — phone is already saved
+    } finally {
+      setEnriched(true);
+      setEnrichSubmitting(false);
+    }
+  }
+
+  const enrichHasData = enrichName.trim() !== "" || enrichEmail.trim() !== "" || enrichProduct !== "";
+
   const waMessage = encodeURIComponent(
-    `Hi, I submitted my number ${phone} on the AP Sanitations website. Please get in touch.`
+    `Hi, I submitted my number +91 ${phone.replace(/\D/g, "")} on the AP Sanitations website. Please get in touch.`
   );
 
   return (
@@ -799,8 +865,10 @@ function ShowroomCTA() {
                       within 24 hours.
                     </p>
                   </div>
+
+                  {/* Primary CTA — always visible, always above enrichment form */}
                   <a
-                    href={`https://wa.me/919302104628?text=${waMessage}`}
+                    href={`https://wa.me/${WA_NUMBER}?text=${waMessage}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-cream rounded-xl px-5 py-3 transition-colors duration-300 text-sm font-sans font-medium w-fit"
@@ -810,6 +878,92 @@ function ShowroomCTA() {
                     </svg>
                     Or chat with us on WhatsApp
                   </a>
+
+                  {/* Enrichment confirmation — shown only after successful submit (not skip) */}
+                  {enriched && enrichSubmitted && (
+                    <p className="font-sans text-cream/60 text-xs">
+                      Details received — we&apos;ll personalise your call.
+                    </p>
+                  )}
+
+                  {/* Enrichment form — optional, disappears once submitted or skipped */}
+                  {leadId && !enriched && (
+                    <div>
+                      <div className="border-t border-cream/10 pt-5">
+                        <p className="font-sans text-cream/50 text-xs uppercase tracking-widest mb-4">
+                          Help us serve you better <span className="normal-case">(optional)</span>
+                        </p>
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={enrichName}
+                            onChange={(e) => setEnrichName(e.target.value)}
+                            placeholder="Your name"
+                            className="editorial-input"
+                            aria-label="Your name"
+                          />
+                          <input
+                            type="email"
+                            value={enrichEmail}
+                            onChange={(e) => { setEnrichEmail(e.target.value); setEnrichEmailError(""); }}
+                            placeholder="Email address"
+                            className="editorial-input"
+                            aria-label="Email address"
+                          />
+                          {enrichEmailError && (
+                            <p className="font-sans text-red-300 text-xs -mt-1">{enrichEmailError}</p>
+                          )}
+                          {/* Custom-styled select — wrapped for chevron overlay */}
+                          <div className="relative">
+                            <select
+                              value={enrichProduct}
+                              onChange={(e) => setEnrichProduct(e.target.value)}
+                              className="editorial-input appearance-none cursor-pointer"
+                              style={{
+                                backgroundColor: '#446f6a',
+                                color: enrichProduct ? '#F7F5F0' : 'rgba(253,252,250,0.4)',
+                              }}
+                              aria-label="What are you looking for?"
+                            >
+                              <option value=""        style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>What are you looking for?</option>
+                              <option value="wellness-spa"              style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Wellness &amp; Spa</option>
+                              <option value="pure-life"                 style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Pure Life (Water Purifiers)</option>
+                              <option value="kitchen-harmony"           style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Kitchen Harmony</option>
+                              <option value="swimming-pool"             style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Swimming Pool Systems</option>
+                              <option value="invisible-infrastructure"  style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Invisible Infrastructure</option>
+                              <option value="shower-systems"            style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Shower Systems</option>
+                              <option value="bathroom-faucets"          style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Bathroom Faucets</option>
+                              <option value="bathtubs"                  style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Bathtubs</option>
+                            </select>
+                            {/* Custom chevron — replaces browser arrow removed by appearance-none */}
+                            <svg
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              className="pointer-events-none absolute right-0 bottom-3.5 w-4 h-4 text-cream/40"
+                              aria-hidden="true"
+                            >
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 mt-4">
+                          <button
+                            onClick={handleEnrich}
+                            disabled={!enrichHasData || enrichSubmitting}
+                            className="font-sans text-sm text-cream/90 hover:text-cream disabled:opacity-30 disabled:cursor-not-allowed transition-colors duration-300 border border-cream/20 hover:border-cream/40 rounded-lg px-4 py-2"
+                          >
+                            {enrichSubmitting ? "Submitting…" : "Submit details"}
+                          </button>
+                          <button
+                            onClick={() => setEnriched(true)}
+                            className="font-sans text-sm text-cream/40 hover:text-cream/70 transition-colors duration-300"
+                          >
+                            Skip →
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 /* Form state */

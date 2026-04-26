@@ -3,8 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import { getProductModelById, getAllProductModels } from '../../../../sanity/lib/queries'
+import { buildWhatsAppUrl } from '../../../../lib/whatsapp'
+import { CATEGORY_LABELS } from '../../../../lib/categoryLabels'
 import { ImageCarousel } from './ImageCarousel'
 import { APLogo } from '../../../../components/APLogo'
+
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const models = await getAllProductModels()
@@ -21,18 +25,6 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   }
 }
 
-const WA_NUMBER = '919302104628'
-
-const CATEGORY_LABELS: Record<string, string> = {
-  'wellness-spa': 'Wellness & Spa',
-  'pure-life': 'Pure Life',
-  'kitchen-harmony': 'Kitchen Harmony',
-  'swimming-pool': 'Swimming Pool Systems',
-  'invisible-infrastructure': 'Invisible Infrastructure',
-  'shower-systems': 'Shower Systems',
-  'bathroom-faucets': 'Bathroom Faucets',
-  'bathtubs': 'Bathtubs',
-}
 
 export default async function ProductDetailPage({
   params,
@@ -56,8 +48,8 @@ export default async function ProductDetailPage({
     }
   }
 
-  const waMessage = encodeURIComponent(
-    `Hi, I'm interested in the ${model.name} from AP Sanitations. Please share more details.`
+  const waUrl = buildWhatsAppUrl(
+    `Hi, I'm interested in the ${model.name} from AP Sanitations, Indore. Please share more details.`
   )
 
   const categoryLabel = CATEGORY_LABELS[category] ?? category
@@ -141,7 +133,7 @@ export default async function ProductDetailPage({
 
             {/* WhatsApp enquiry */}
             <a
-              href={`https://wa.me/${WA_NUMBER}?text=${waMessage}`}
+              href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 bg-[#25D366] hover:bg-[#20bb5a] text-white rounded-xl px-5 py-4 transition-colors duration-300 font-sans font-medium text-sm w-full justify-center"

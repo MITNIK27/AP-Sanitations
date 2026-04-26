@@ -2,8 +2,12 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getBrandBySlug, getBrands, getProductModelsByBrand } from '../../../sanity/lib/queries'
+import { buildWhatsAppUrl } from '../../../lib/whatsapp'
+import { CATEGORY_LABELS } from '../../../lib/categoryLabels'
 import { BrandCatalogues } from './BrandCatalogues'
 import { APLogo } from '../../../components/APLogo'
+
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const brands = await getBrands()
@@ -20,8 +24,6 @@ export async function generateMetadata({ params }: { params: Promise<{ brandId: 
   }
 }
 
-const WA_NUMBER = '919302104628'
-
 export default async function BrandPage({ params }: { params: Promise<{ brandId: string }> }) {
   const { brandId } = await params
   const [brand, models] = await Promise.all([
@@ -30,7 +32,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
   ])
   if (!brand) notFound()
 
-  const waMessage = encodeURIComponent(
+  const waUrl = buildWhatsAppUrl(
     `Hi, I'm interested in ${brand.name} products from AP Sanitations, Indore. Please get in touch.`
   )
 
@@ -98,7 +100,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
           <div className="space-y-4">
             {/* WhatsApp */}
             <a
-              href={`https://wa.me/${WA_NUMBER}?text=${waMessage}`}
+              href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 bg-[#25D366] hover:bg-[#20bb5a] text-white rounded-xl px-5 py-4 transition-colors duration-300 font-sans font-medium text-sm w-full justify-center"
@@ -140,16 +142,6 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
 
       {/* Product Models — grouped by category if multiple categories present */}
       {models.length > 0 && (() => {
-        const CATEGORY_LABELS: Record<string, string> = {
-          'shower-systems':   'Shower Systems',
-          'bathtubs':         'Bathtubs',
-          'bathroom-faucets': 'Bathroom Faucets',
-          'wellness-spa':     'Wellness & SPA',
-          'pure-life':        'Pure Life',
-          'kitchen-harmony':  'Kitchen Harmony',
-          'swimming-pool':    'Swimming Pool',
-        }
-
         // Group models by category, preserving order
         const categoryOrder: string[] = []
         const grouped: Record<string, typeof models> = {}
