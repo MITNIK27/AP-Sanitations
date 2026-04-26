@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import LenisProvider from "@/components/LenisProvider";
+import { FloatingWhatsApp } from "@/components/FloatingWhatsApp";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -64,7 +66,11 @@ export default function RootLayout({
       className={`${cormorant.variable} ${dmSans.variable}`}
     >
       <body className="font-sans bg-cream text-charcoal antialiased">
-        <LenisProvider>{children}</LenisProvider>
+        <LenisProvider>
+          {children}
+          <FloatingWhatsApp />
+          <GlobalSearch />
+        </LenisProvider>
       </body>
     </html>
   );

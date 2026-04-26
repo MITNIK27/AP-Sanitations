@@ -7,6 +7,7 @@ import { PaginatedProductGrid } from './PaginatedProductGrid'
 import { GroupedProductGrid } from './GroupedProductGrid'
 import { CatalogueSection } from './CatalogueSection'
 import { APLogo } from '../../../components/APLogo'
+import { SearchTriggerButton } from '../../../components/SearchTriggerButton'
 
 export const revalidate = 3600
 
@@ -74,9 +75,12 @@ export default async function ProductCategoryPage({ params }: { params: Promise<
           </svg>
           Back to site
         </Link>
-        <Link href="/" className="hover:opacity-75 transition-opacity duration-300">
-          <APLogo size="sm" variant="light" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <SearchTriggerButton variant="dark" />
+          <Link href="/" className="hover:opacity-75 transition-opacity duration-300">
+            <APLogo size="sm" variant="light" />
+          </Link>
+        </div>
       </div>
 
       {/* Hero */}

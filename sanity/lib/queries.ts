@@ -140,3 +140,25 @@ export async function getProductModelsByCategory(category: string): Promise<Prod
     { category }
   )
 }
+
+export interface ProductModelSearchItem {
+  _id: string
+  name: string
+  brandName: string
+  category: string
+  subCategory?: string
+  description?: string
+}
+
+export async function getAllProductModelsForSearch(): Promise<ProductModelSearchItem[]> {
+  return client.fetch(
+    `*[_type == "productModel"] | order(order asc) {
+      _id,
+      name,
+      "brandName": brand->name,
+      category,
+      subCategory,
+      description,
+    }`
+  )
+}

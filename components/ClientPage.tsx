@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView, AnimatePresence, type Variants } from "framer-motion";
 import Image from "next/image";
 import { APLogo } from "@/components/APLogo";
+import { SearchTriggerButton } from "@/components/SearchTriggerButton";
 import type { Brand } from "@/data/brands";
 import type { Product } from "@/data/products";
 import { WA_NUMBER } from '@/lib/whatsapp'
@@ -146,6 +147,7 @@ function Navbar() {
                 {link.label}
               </a>
             ))}
+            <SearchTriggerButton variant={scrolled ? "dark" : "light"} />
             <a
               href="#contact"
               className="text-sm font-sans font-medium transition-colors duration-400 text-gold hover:text-gold-dark"
@@ -154,16 +156,19 @@ function Navbar() {
             </a>
           </nav>
 
-          {/* Mobile: text toggle */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className={`md:hidden font-sans text-sm font-medium tracking-wide transition-colors duration-400 ${
-              scrolled ? "text-charcoal" : "text-cream"
-            }`}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? "Close" : "Menu"}
-          </button>
+          {/* Mobile: search + menu toggle */}
+          <div className="flex items-center gap-1 md:hidden">
+            <SearchTriggerButton variant={scrolled ? "dark" : "light"} />
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className={`font-sans text-sm font-medium tracking-wide transition-colors duration-400 px-1 ${
+                scrolled ? "text-charcoal" : "text-cream"
+              }`}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? "Close" : "Menu"}
+            </button>
+          </div>
         </div>
       </div>
 
