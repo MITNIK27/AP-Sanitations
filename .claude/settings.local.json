@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.jaquar.com)",
+      "WebFetch(domain:www.kohler.co.in)",
+      "WebFetch(domain:www.bharmalsanitary.com)",
+      "WebFetch(domain:lenis.darkroom.engineering)",
+      "Bash(npm install:*)",
+      "Bash(mkdir -p \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\public\\\\pics\")",
+      "Bash(cp \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\pics\\\\Anupam_sinks.jpg\" \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\public\\\\pics\\\\Anupam_sinks.jpg\")",
+      "Bash(cp \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\pics\\\\Sofpour.jpg\" \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\public\\\\pics\\\\Sofpour.jpg\")",
+      "Bash(cp \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\pics\\\\WG.jpg\" \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\public\\\\pics\\\\WG.jpg\")",
+      "Bash(cp \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\pics\\\\WG.mp4\" \"c:\\\\Users\\\\Parth\\\\Documents\\\\AP Sanitations\\\\public\\\\pics\\\\WG.mp4\")",
+      "Bash(npm view:*)"
+    ]
+  }
+}

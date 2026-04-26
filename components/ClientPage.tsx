@@ -1,0 +1,978 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView, AnimatePresence, type Variants } from "framer-motion";
+import Image from "next/image";
+import { APLogo } from "@/components/APLogo";
+import type { Brand } from "@/data/brands";
+import type { Product } from "@/data/products";
+
+// ─── Shared Animation Variants ────────────────────────────────────────────────
+
+const ease = [0.25, 0.46, 0.45, 0.94] as const;
+
+const fadeUp = {
+  hidden:  { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease } },
+};
+
+const fadeIn = {
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.6, ease } },
+};
+
+const stagger = {
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+const slideFromLeft = {
+  hidden:  { opacity: 0, x: -40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.9, ease } },
+};
+
+// ─── Scroll Reveal Helper ─────────────────────────────────────────────────────
+
+function Reveal({
+  children,
+  variants = fadeUp,
+  className = "",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  variants?: Variants;
+  className?: string;
+  delay?: number;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <motion.div
+      ref={ref}
+      variants={variants}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      transition={{ delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ─── SVG Icons (thin line, no emoji) ─────────────────────────────────────────
+
+function IconPhone({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 14.92v2z" />
+    </svg>
+  );
+}
+
+function IconMapPin({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function IconArrow({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
+
+// ─── 1. Navbar ────────────────────────────────────────────────────────────────
+
+const navLinks = [
+  { label: "Products", href: "#products" },
+  { label: "Brands",   href: "#brands"   },
+  { label: "About",    href: "#about"    },
+];
+
+function Navbar() {
+  const [scrolled, setScrolled]   = useState(false);
+  const [menuOpen, setMenuOpen]   = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <motion.header
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-600 ${
+        scrolled
+          ? "bg-cream/95 backdrop-blur-sm border-b border-gold/20"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="container-wide">
+        <div className="flex items-center justify-between h-16 md:h-20">
+
+          {/* Logo */}
+          <a href="#home" className="group">
+            <APLogo
+              size="md"
+              variant={scrolled ? 'light' : 'dark'}
+              className="transition-all duration-400"
+            />
+          </a>
+
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className={`link-underline transition-colors duration-400 ${
+                  scrolled ? "text-charcoal" : "text-charcoal/70 hover:text-charcoal"
+                }`}
+              >
+                {link.label}
+              </a>
+            ))}
+            <a
+              href="#contact"
+              className="text-sm font-sans font-medium transition-colors duration-400 text-gold hover:text-gold-dark"
+            >
+              Visit Showroom&nbsp;→
+            </a>
+          </nav>
+
+          {/* Mobile: text toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className={`md:hidden font-sans text-sm font-medium tracking-wide transition-colors duration-400 ${
+              scrolled ? "text-charcoal" : "text-cream"
+            }`}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? "Close" : "Menu"}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease }}
+            className="md:hidden bg-cream border-t border-stone/20 overflow-hidden"
+          >
+            <div className="container-wide py-6 space-y-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="block font-sans font-medium text-charcoal hover:text-gold transition-colors duration-400"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <a
+                href="#contact"
+                onClick={() => setMenuOpen(false)}
+                className="block font-sans font-medium text-gold"
+              >
+                Visit Showroom →
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
+  );
+}
+
+// ─── 2. Hero ──────────────────────────────────────────────────────────────────
+
+function Hero() {
+  return (
+    <section
+      id="home"
+      className="relative flex min-h-screen flex-col md:flex-row overflow-hidden bg-charcoal"
+    >
+      {/* Left — Atmospheric image (placeholder: replace with showroom/product photo) */}
+      {/* TODO: Replace this div with <Image> from next/image once real photo is provided */}
+      <motion.div
+        variants={slideFromLeft}
+        initial="hidden"
+        animate="visible"
+        className="relative w-full md:w-[55%] min-h-[50vh] md:min-h-screen grain flex-shrink-0"
+        style={{
+          background:
+            "linear-gradient(160deg, #3D6B65 0%, #2A4D49 45%, #1A1914 100%)",
+        }}
+      >
+        {/* Subtle texture overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse at 30% 60%, rgba(61,107,101,0.4) 0%, transparent 65%)",
+          }}
+        />
+
+        {/* Placeholder label — remove when real image is added */}
+        <div className="absolute bottom-6 left-6 label text-cream/30">
+          {/* Showroom / product photograph */}
+        </div>
+      </motion.div>
+
+      {/* Right — Editorial text */}
+      <div className="flex w-full md:w-[45%] items-center bg-cream px-8 md:px-12 lg:px-16 py-24 md:py-0">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="max-w-md"
+        >
+          {/* Label */}
+          <motion.p variants={fadeUp} className="label mb-6">
+            Est.&nbsp;2003&nbsp;&nbsp;·&nbsp;&nbsp;Indore
+          </motion.p>
+
+          {/* Headline */}
+          <motion.h1
+            variants={fadeUp}
+            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] leading-[1.05] text-charcoal mb-6"
+          >
+            To elevate every space with smart, sustainable, and luxurious water solutions.
+          </motion.h1>
+
+          {/* Rule + attribution */}
+          <motion.div variants={fadeUp} className="flex items-center gap-4 mb-8">
+            <span className="rule-gold flex-shrink-0" />
+            <span className="font-display italic text-stone text-base">
+              — Prem Sahni, AP Sanitations
+            </span>
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div variants={fadeUp}>
+            <a
+              href="#brands"
+              className="cta-ghost text-charcoal hover:text-gold"
+            >
+              <span>Explore</span>
+              <IconArrow />
+            </a>
+          </motion.div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+// ─── 3. Philosophy Strip ──────────────────────────────────────────────────────
+
+function PhilosophyStrip() {
+  return (
+    <Reveal variants={fadeIn}>
+      <div className="bg-charcoal py-5 overflow-hidden">
+        <p className="text-center label text-cream/40">
+          Est.&nbsp;2003&nbsp;&nbsp;·&nbsp;&nbsp;Samyak Park Building,
+          Indore&nbsp;&nbsp;·&nbsp;&nbsp;Authorized
+          Dealer&nbsp;&nbsp;·&nbsp;&nbsp;Signature Brand Collection
+        </p>
+      </div>
+    </Reveal>
+  );
+}
+
+// ─── 4. Brand Showcase ────────────────────────────────────────────────────────
+
+function BrandStrip({
+  brand,
+  index,
+}: {
+  brand: Brand;
+  index: number;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const isImageLeft = brand.layout === "image-left";
+
+  return (
+    <motion.div
+      ref={ref}
+      variants={fadeIn}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      className={`flex flex-col ${
+        isImageLeft ? "md:flex-row" : "md:flex-row-reverse"
+      } min-h-[60vh] border-b border-stone/10`}
+    >
+      {/* Image / Video side */}
+      <div
+        className={`relative w-full md:w-[40%] min-h-[40vw] md:min-h-0 overflow-hidden group ${
+          brand.objectFit === 'contain' ? 'bg-white flex items-center justify-center p-6 md:p-10' : ''
+        }`}
+      >
+        {brand.videoSrc ? (
+          /* Video (e.g. Woven Gold) — autoplay, muted, looped */
+          <video
+            src={brand.videoSrc}
+            poster={brand.videoPoster}
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label={brand.imageAlt}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
+          />
+        ) : brand.imageSrc ? (
+          brand.objectFit === 'contain' ? (
+            /* Contained image (e.g. PNB) — centred with padding, not stretched */
+            <Image
+              src={brand.imageSrc}
+              alt={brand.imageAlt}
+              width={480}
+              height={600}
+              className="relative w-full h-auto max-h-[60vh] object-contain transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
+            />
+          ) : (
+            /* Cover image (e.g. Anupam, Sofpour) */
+            <Image
+              src={brand.imageSrc}
+              alt={brand.imageAlt}
+              fill
+              sizes="(max-width: 768px) 100vw, 40vw"
+              className="object-cover transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
+            />
+          )
+        ) : (
+          /* Gradient fallback */
+          <div
+            className="absolute inset-0 transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
+            style={{ background: brand.placeholderGradient }}
+            aria-label={brand.imageAlt}
+            role="img"
+          />
+        )}
+      </div>
+
+      {/* Text side */}
+      <div
+        className={`flex w-full md:w-[60%] flex-col justify-center py-16 md:py-0 ${
+          isImageLeft ? 'px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 lg:px-12'
+        } ${
+          index % 2 === 0 ? "bg-cream" : "bg-linen"
+        }`}
+      >
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          className="max-w-md"
+        >
+          <motion.p variants={fadeUp} className="label mb-5">
+            Brand Partner
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
+            className="font-display text-5xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 hover:text-gold cursor-default"
+          >
+            {brand.name}
+          </motion.h2>
+          <motion.p variants={fadeUp} className="font-sans text-stone text-sm mb-6 leading-relaxed">
+            {brand.tagline}
+          </motion.p>
+          <motion.p variants={fadeUp} className="font-sans text-charcoal/70 text-sm leading-relaxed mb-8">
+            {brand.description}
+          </motion.p>
+          <motion.a variants={fadeUp} href={`/brands/${brand.id}`} className="cta-ghost">
+            <span>Enquire about {brand.name}</span>
+            <IconArrow />
+          </motion.a>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+
+function BrandShowcase({ brands }: { brands: Brand[] }) {
+  return (
+    <section id="brands">
+      {/* Section header */}
+      <div className="container-wide py-20 md:py-24">
+        <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <p className="label mb-4">Our Brands</p>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+              Curated for Excellence
+            </h2>
+          </div>
+          <p className="font-sans text-stone text-sm max-w-xs leading-relaxed">
+            We partner only with manufacturers who share our commitment to quality,
+            craft, and the long-term wellbeing of your home.
+          </p>
+        </Reveal>
+      </div>
+
+      {/* Brand strips */}
+      <div className="border-t border-stone/10">
+        {brands.map((brand, i) => (
+          <BrandStrip key={brand.id} brand={brand} index={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── 5. Products — Bento Grid ─────────────────────────────────────────────────
+
+function ProductCard({ product }: { product: Product }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-40px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      variants={fadeUp}
+      initial="hidden"
+      animate={inView ? "visible" : "hidden"}
+      className={`bento-card group ${product.bg} ${product.text} ${product.gridCols} ${product.gridRows} border border-transparent hover:border-gold/40 transition-all duration-400`}
+    >
+      {/* Ghost number */}
+      <div
+        className="font-display text-[7rem] md:text-[10rem] leading-none font-bold select-none
+                   absolute top-4 right-6 opacity-[0.08] group-hover:opacity-[0.2]
+                   transition-opacity duration-400 pointer-events-none"
+      >
+        {product.number}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full justify-end gap-4">
+        <p className={`label ${product.text === "text-cream" ? "text-cream/50" : "text-stone"}`}>
+          {product.category}
+        </p>
+        <h3 className="font-display text-3xl md:text-4xl leading-tight">
+          {product.title}
+        </h3>
+        <p className={`font-sans text-sm leading-relaxed max-w-sm ${
+          product.text === "text-cream" ? "text-cream/70" : "text-charcoal/60"
+        }`}>
+          {product.description}
+        </p>
+        <a href={`/products/${product.id}`} className="cta-ghost mt-2 self-start">
+          <span>Learn more</span>
+          <IconArrow />
+        </a>
+      </div>
+    </motion.div>
+  );
+}
+
+function Products({ products }: { products: Product[] }) {
+  return (
+    <section id="products" className="py-20 md:py-28 bg-cream">
+      <div className="container-wide">
+        <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+          <div>
+            <p className="label mb-4">What We Offer</p>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+              Solutions for Every Corner
+            </h2>
+          </div>
+          <p className="font-sans text-stone text-sm max-w-xs leading-relaxed">
+            From concealed systems behind the walls to the rainfall shower above —
+            every water touchpoint in your home, considered.
+          </p>
+        </Reveal>
+
+        {/* Bento grid — 3 cols, 3 rows */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 auto-rows-[28rem] md:auto-rows-[22rem]">
+          {/* 01 Wellness & Spa — col 1-2, row 1-2 */}
+          <div className="md:col-span-2 md:row-span-2 h-full">
+            <ProductCard product={products[0]} />
+          </div>
+
+          {/* 02 Pure Life — col 3, row 1 */}
+          <div className="md:col-span-1 md:row-span-1 h-full">
+            <ProductCard product={products[1]} />
+          </div>
+
+          {/* 03 Kitchen Harmony — col 3, row 2 */}
+          <div className="md:col-span-1 md:row-span-1 h-full">
+            <ProductCard product={products[2]} />
+          </div>
+
+          {/* 04 Swimming Pool — col 1-2, row 3 */}
+          <div className="md:col-span-2 md:row-span-1 h-full">
+            <ProductCard product={products[3]} />
+          </div>
+
+          {/* 05 Invisible Infrastructure — col 3, row 3 */}
+          <div className="md:col-span-1 md:row-span-1 h-full">
+            <ProductCard product={products[4]} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── 6. Heritage Timeline ─────────────────────────────────────────────────────
+
+const timelineEvents = [
+  {
+    year: "1998",
+    event:
+      "Prem Sahni begins his journey in the sanitation industry — learning the craft through Jaquar, India's most respected bath fitting brand.",
+  },
+  {
+    year: "2003",
+    event:
+      "AP Sanitations is established at Samyak Park Building, Indore — the same address it calls home today. The first chapter begins with Springs and bath fittings.",
+  },
+  {
+    year: "2005",
+    event:
+      "Sole authorized dealer for Anupam in Madhya Pradesh — the first exclusive partnership, and a defining milestone for the business.",
+  },
+  {
+    year: "2021",
+    event:
+      "Sofpour joins the catalogue — precision flow technology that changed the way our customers experience everyday water.",
+  },
+  {
+    year: "2022",
+    event:
+      "Woven Gold partnership begins — a name that defines luxury sanitation in India, now available exclusively through AP Sanitations.",
+  },
+  {
+    year: "Today",
+    event:
+      "Over 10,000 families across Indore and Madhya Pradesh served — and still counting.",
+  },
+];
+
+function Heritage() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+
+  return (
+    <section id="about" className="relative py-20 md:py-28 bg-linen overflow-hidden">
+      {/* Watermark: घर (ghar = home) */}
+      <div
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+        aria-hidden
+      >
+        <span className="font-display  text-[20vw] leading-none text-charcoal/[0.05]">
+          घर
+        </span>
+      </div>
+
+      <div ref={ref} className="container-wide relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+
+          {/* Left — Timeline */}
+          <div>
+            <Reveal className="mb-10">
+              <p className="label mb-4">Our Heritage</p>
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+                Since 1998. One Craft. One Promise.
+              </h2>
+            </Reveal>
+
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              className="relative pl-6"
+            >
+              {/* Vertical gold line */}
+              <div className="absolute left-0 top-2 bottom-2 w-px bg-gold/40" />
+
+              {timelineEvents.map((item) => (
+                <motion.div
+                  key={item.year}
+                  variants={fadeUp}
+                  className="relative mb-10 last:mb-0"
+                >
+                  {/* Dot */}
+                  <div className="absolute -left-[1.4rem] top-1.5 w-2.5 h-2.5 rounded-full bg-gold" />
+
+                  <p className="font-display text-gold text-2xl mb-1">{item.year}</p>
+                  <p className="font-sans text-sm text-charcoal/70 leading-relaxed">
+                    {item.event}
+                  </p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          {/* Right — Story */}
+          <div className="flex flex-col justify-center gap-8">
+            <Reveal>
+              <blockquote className="font-display italic text-3xl md:text-4xl lg:text-[2.6rem] text-charcoal leading-snug">
+                "Built on trust, one home at a time."
+              </blockquote>
+            </Reveal>
+
+            <Reveal delay={0.1}>
+              <p className="font-sans text-charcoal/70 text-sm leading-relaxed">
+                Prem Sahni began his journey in the sanitation industry in 1998, building
+                expertise through Jaquar — one of India's most trusted names in bath
+                fittings. By 2003, he was ready to build something of his own. AP
+                Sanitations opened at Samyak Park Building, Indore, and has stood at the
+                same address ever since.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <p className="font-sans text-charcoal/70 text-sm leading-relaxed">
+                What he built was not just a dealership — it was a reputation, earned
+                product by product and customer by customer. Every brand in the AP
+                Sanitations portfolio has been personally vetted by Prem Sahni. Every
+                product earns its place through merit, never convenience.
+              </p>
+            </Reveal>
+
+            <Reveal delay={0.3}>
+              <div className="border-l-2 border-gold pl-5 py-1">
+                <p className="font-display italic text-xl text-charcoal/80">
+                  "Every tap we fit, every tub and sink we install — it carries 25+
+                  years of learning."
+                </p>
+                <p className="font-sans text-stone text-xs mt-2 tracking-wide">
+                  — Prem Sahni
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.4}>
+              <div className="flex flex-wrap gap-3 pt-2">
+                {["Est. 2003", "Expert Guidance", "Trusted Since 1998", "After-Sales Care"].map(
+                  (tag) => (
+                    <span
+                      key={tag}
+                      className="font-sans text-xs text-stone border border-stone/30 rounded-full px-4 py-1.5"
+                    >
+                      {tag}
+                    </span>
+                  )
+                )}
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── 7. Showroom CTA ─────────────────────────────────────────────────────────
+
+function ShowroomCTA() {
+  const [phone, setPhone] = useState("");
+  const [whatsappOptIn, setWhatsappOptIn] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const cleaned = phone.replace(/\D/g, "");
+    if (cleaned.length !== 10) {
+      setError("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    setError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: cleaned, source: "contact-form", whatsappOptIn }),
+      });
+      if (!res.ok) throw new Error("Server error");
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please call us directly.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const waMessage = encodeURIComponent(
+    `Hi, I submitted my number ${phone} on the AP Sanitations website. Please get in touch.`
+  );
+
+  return (
+    <section
+      id="contact"
+      className="relative py-20 md:py-28 bg-teal overflow-hidden"
+    >
+      {/* Subtle background gradient */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 20% 50%, rgba(90,145,137,0.3) 0%, transparent 60%)",
+        }}
+      />
+
+      <div className="container-wide relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+          {/* Left — Heading + contact */}
+          <Reveal variants={fadeUp}>
+            <p className="label text-cream/50 mb-6">Come Visit Us</p>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-cream leading-tight mb-10">
+              Come, see it<br />in person.
+            </h2>
+
+            <div className="space-y-6">
+              {/* Mobile */}
+              <a
+                href="tel:9302104628"
+                className="group flex items-start gap-4 text-cream/80 hover:text-cream transition-colors duration-400"
+              >
+                <IconPhone className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
+                <div>
+                  <p className="label text-cream/40 mb-1">Mobile</p>
+                  <p className="font-sans font-medium text-lg group-hover:text-gold transition-colors duration-400">
+                    +91 9302104628
+                  </p>
+                </div>
+              </a>
+
+              {/* Landline */}
+              <a
+                href="tel:07314038838"
+                className="group flex items-start gap-4 text-cream/80 hover:text-cream transition-colors duration-400"
+              >
+                <IconPhone className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
+                <div>
+                  <p className="label text-cream/40 mb-1">Landline</p>
+                  <p className="font-sans font-medium text-lg group-hover:text-gold transition-colors duration-400">
+                    0731-4038838
+                  </p>
+                </div>
+              </a>
+
+              {/* Address */}
+              <div className="flex items-start gap-4 text-cream/80">
+                <IconMapPin className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
+                <div>
+                  <p className="label text-cream/40 mb-1">Our Showroom</p>
+                  <p className="font-sans text-sm leading-relaxed">
+                    Samyak Park Building,<br />
+                    Indore, Madhya Pradesh 452001
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* Right — Lead capture */}
+          <Reveal variants={fadeUp} delay={0.15}>
+            <div className="bg-cream/10 backdrop-blur-sm rounded-2xl p-8 md:p-10 border border-cream/10">
+              {submitted ? (
+                /* Success state */
+                <div className="space-y-6">
+                  <div>
+                    <p className="font-display italic text-cream text-2xl md:text-3xl mb-3">
+                      Thank you!
+                    </p>
+                    <p className="font-sans text-cream/80 text-sm leading-relaxed">
+                      Our team at AP Sanitations will reach you at{" "}
+                      <span className="text-gold font-medium">+91 {phone.replace(/\D/g, "")}</span>{" "}
+                      within 24 hours.
+                    </p>
+                  </div>
+                  <a
+                    href={`https://wa.me/919302104628?text=${waMessage}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-cream rounded-xl px-5 py-3 transition-colors duration-300 text-sm font-sans font-medium w-fit"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-5 h-5 fill-[#25D366]" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Or chat with us on WhatsApp
+                  </a>
+                </div>
+              ) : (
+                /* Form state */
+                <>
+                  <p className="font-display italic text-cream text-2xl md:text-3xl mb-2">
+                    Start your wellness journey
+                  </p>
+                  <p className="font-sans text-cream/60 text-sm mb-8">
+                    Leave your number and our team will call you back.
+                  </p>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="Enter your phone number"
+                        className="editorial-input"
+                        aria-label="Your phone number"
+                        maxLength={10}
+                      />
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        aria-label="Send"
+                        className="absolute right-0 bottom-3 text-gold hover:text-gold-light transition-colors duration-400 disabled:opacity-50"
+                      >
+                        <IconArrow className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* WhatsApp opt-in */}
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={whatsappOptIn}
+                        onChange={(e) => setWhatsappOptIn(e.target.checked)}
+                        className="w-4 h-4 rounded border-cream/30 bg-cream/10 accent-gold"
+                      />
+                      <span className="font-sans text-cream/60 text-xs group-hover:text-cream/80 transition-colors duration-300">
+                        Send me updates on WhatsApp
+                      </span>
+                    </label>
+
+                    {error && (
+                      <p className="font-sans text-red-300 text-xs">{error}</p>
+                    )}
+                    <p className="font-sans text-cream/30 text-xs">
+                      No spam. We&apos;ll reach out once to understand your needs.
+                    </p>
+                  </form>
+                </>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── 8. Footer ────────────────────────────────────────────────────────────────
+
+function Footer({ brands }: { brands: Brand[] }) {
+  return (
+    <footer className="bg-charcoal text-cream">
+      {/* Logo */}
+      <div className="container-wide pt-16 md:pt-20 pb-10 border-b border-stone/20">
+        <APLogo size="xl" variant="dark" tagline />
+      </div>
+
+      {/* 3-col info */}
+      <div className="container-wide py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+          {/* Address */}
+          <div>
+            <p className="label text-stone mb-4">Showroom</p>
+            <address className="font-sans text-sm text-stone not-italic leading-relaxed">
+              Samyak Park Building,<br />
+              Indore, Madhya Pradesh 452001<br />
+              <a
+                href="tel:9302104628"
+                className="text-cream/70 hover:text-gold transition-colors duration-400 mt-2 inline-block"
+              >
+                +91 9302104628
+              </a>
+              <br />
+              <a
+                href="tel:07314038838"
+                className="text-cream/70 hover:text-gold transition-colors duration-400 mt-1 inline-block"
+              >
+                0731-4038838
+              </a>
+            </address>
+          </div>
+
+          {/* Brands */}
+          <div className="md:text-center">
+            <p className="label text-stone mb-4">Authorized Dealer</p>
+            <div className="space-y-1.5">
+              {brands.map((b) => (
+                <p key={b.id} className="font-sans text-sm text-stone/70">
+                  {b.name}
+                </p>
+              ))}
+            </div>
+          </div>
+
+          {/* Nav */}
+          <div className="md:text-right">
+            <p className="label text-stone mb-4">Navigate</p>
+            <div className="space-y-1.5">
+              {[...navLinks, { label: "Contact", href: "#contact" }].map((link) => (
+                <p key={link.label}>
+                  <a
+                    href={link.href}
+                    className="font-sans text-sm text-stone/70 hover:text-gold transition-colors duration-400"
+                  >
+                    {link.label}
+                  </a>
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Copyright */}
+      <div className="container-wide pb-8">
+        <div className="border-t border-stone/20 pt-6 flex flex-col md:flex-row md:justify-between gap-2">
+          <p className="font-sans text-xs text-stone/50">
+            © {new Date().getFullYear()} AP Sanitations, Indore. All rights reserved.
+          </p>
+          <p className="font-sans text-xs text-stone/30">
+            Crafted with care.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function ClientPage({
+  brands,
+  products,
+}: {
+  brands: Brand[];
+  products: Product[];
+}) {
+  return (
+    <main>
+      <Navbar />
+      <Hero />
+      <PhilosophyStrip />
+      <BrandShowcase brands={brands} />
+      <Products products={products} />
+      <Heritage />
+      <ShowroomCTA />
+      <Footer brands={brands} />
+    </main>
+  );
+}

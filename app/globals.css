@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────────────────────────────── */
+
+@layer base {
+  html {
+    /* Lenis overrides scroll-behavior — keep as auto to avoid conflicts */
+    scroll-behavior: auto;
+  }
+
+  body {
+    @apply bg-cream text-charcoal antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: #B8935A;
+    color: #F7F5F0;
+  }
+
+  /* Remove default tap highlight on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ─── Typography Utilities ───────────────────────────────────────────────────── */
+
+@layer utilities {
+  /* Display headings — Cormorant Garamond */
+  .font-display {
+    font-family: var(--font-cormorant), Georgia, serif;
+  }
+
+  /* Grain texture overlay — used on hero image placeholder and atmospheric sections */
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.06'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    opacity: 0.12;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+
+  /* Editorial label — small all-caps with wide tracking */
+  .label {
+    @apply font-sans text-xs font-medium uppercase tracking-ticker text-stone;
+  }
+
+  /* Thin horizontal divider line — gold */
+  .rule-gold {
+    @apply block h-px bg-gold w-12;
+  }
+
+  /* Full-width section container */
+  .container-wide {
+    @apply max-w-7xl mx-auto px-5 sm:px-8 lg:px-12;
+  }
+}
+
+/* ─── Component Patterns ─────────────────────────────────────────────────────── */
+
+@layer components {
+  /* Link with animated underline */
+  .link-underline {
+    @apply relative inline-block text-charcoal font-sans text-sm font-medium;
+  }
+  .link-underline::after {
+    content: "";
+    @apply absolute left-0 bottom-0 h-px w-0 bg-gold transition-all duration-400;
+  }
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Ghost arrow CTA — used in brand strips */
+  .cta-ghost {
+    @apply inline-flex items-center gap-2 text-sm font-sans font-medium text-stone
+           transition-colors duration-400 hover:text-gold;
+  }
+
+  /* Bento card base — h-full ensures it fills its grid cell */
+  .bento-card {
+    @apply relative overflow-hidden rounded-2xl p-8 md:p-12
+           h-full transition-all duration-400 cursor-default;
+  }
+
+  /* Single-line editorial input */
+  .editorial-input {
+    @apply w-full bg-transparent border-b border-cream/40 text-cream
+           placeholder-cream/40 font-sans text-sm py-3 pr-10
+           focus:outline-none focus:border-gold transition-colors duration-400;
+  }
+}
+
+/* ─── Lenis ──────────────────────────────────────────────────────────────────── */
+
+/* Ensure Lenis doesn't fight with overflow on the root */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
