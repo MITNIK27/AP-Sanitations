@@ -219,7 +219,7 @@ function Hero() {
         variants={slideFromLeft}
         initial="hidden"
         animate="visible"
-        className="w-full md:w-[55%] min-h-[50vh] md:min-h-screen flex-shrink-0 flex flex-col gap-3 p-5 md:p-8 grain"
+        className="w-full md:w-[55%] min-h-[40vh] md:min-h-screen flex-shrink-0 flex flex-col gap-3 p-4 md:p-8 grain"
       >
         {/* Top frame — Showroom 1 */}
         <div className="relative flex-1 overflow-hidden rounded-sm ring-1 ring-gold/25">
@@ -251,7 +251,7 @@ function Hero() {
       </motion.div>
 
       {/* Right — Editorial text */}
-      <div className="relative flex w-full md:w-[45%] items-center px-8 md:px-12 lg:px-16 py-24 md:py-0 md:border-l md:border-white/[0.06]">
+      <div className="relative flex flex-1 md:flex-none w-full md:w-[45%] items-center px-5 sm:px-8 md:px-10 lg:px-14 py-8 md:py-0 md:border-l md:border-white/[0.06]">
         {/* Subtle teal atmospheric glow — ties back to the brand's green heritage */}
         <div
           className="absolute inset-0 pointer-events-none"
@@ -264,22 +264,22 @@ function Hero() {
           className="max-w-md relative"
         >
           {/* Label */}
-          <motion.p variants={fadeUp} className="label mb-6">
+          <motion.p variants={fadeUp} className="label mb-3 md:mb-6">
             Est.&nbsp;2003&nbsp;&nbsp;·&nbsp;&nbsp;Indore
           </motion.p>
 
           {/* Headline */}
           <motion.h1
             variants={fadeUp}
-            className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4.5rem] leading-[1.05] text-cream mb-6"
+            className="font-display text-[1.75rem] sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] leading-snug md:leading-[1.08] text-cream mb-4 md:mb-6"
           >
             To elevate every space with smart, sustainable, and luxurious water solutions.
           </motion.h1>
 
           {/* Rule + attribution */}
-          <motion.div variants={fadeUp} className="flex items-center gap-4 mb-8">
+          <motion.div variants={fadeUp} className="flex items-center gap-4 mb-5 md:mb-8">
             <span className="rule-gold flex-shrink-0" />
-            <span className="font-display italic text-stone text-base">
+            <span className="font-display italic text-stone text-sm md:text-base">
               — Prem Sahni, AP Sanitations
             </span>
           </motion.div>
@@ -341,7 +341,7 @@ function BrandStrip({
     >
       {/* Image / Video side */}
       <div
-        className={`relative w-full md:w-[40%] min-h-[40vw] md:min-h-0 overflow-hidden group ${
+        className={`relative w-full md:w-[40%] min-h-[56vw] md:min-h-0 overflow-hidden group ${
           brand.objectFit === 'contain' ? 'bg-white flex items-center justify-center p-6 md:p-10' : ''
         }`}
       >
@@ -390,8 +390,8 @@ function BrandStrip({
 
       {/* Text side */}
       <div
-        className={`flex w-full md:w-[60%] flex-col justify-center py-16 md:py-0 ${
-          isImageLeft ? 'px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 lg:px-12'
+        className={`flex w-full md:w-[60%] flex-col justify-center py-10 md:py-0 ${
+          isImageLeft ? 'px-5 sm:px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 lg:px-12'
         } ${
           index % 2 === 0 ? "bg-cream" : "bg-linen"
         }`}
@@ -407,7 +407,7 @@ function BrandStrip({
           </motion.p>
           <motion.h2
             variants={fadeUp}
-            className="font-display text-5xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 hover:text-gold cursor-default"
+            className="font-display text-4xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 hover:text-gold cursor-default"
           >
             {brand.name}
           </motion.h2>
@@ -431,11 +431,11 @@ function BrandShowcase({ brands }: { brands: Brand[] }) {
   return (
     <section id="brands">
       {/* Section header */}
-      <div className="container-wide py-20 md:py-24">
+      <div className="container-wide py-10 md:py-24">
         <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <p className="label mb-4">Our Brands</p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+            <p className="label mb-3 md:mb-4">Our Brands</p>
+            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
               Curated for Excellence
             </h2>
           </div>
@@ -503,12 +503,12 @@ function ProductCard({ product }: { product: Product }) {
 
 function Products({ products }: { products: Product[] }) {
   return (
-    <section id="products" className="py-20 md:py-28 bg-cream">
+    <section id="products" className="py-12 md:py-28 bg-cream">
       <div className="container-wide">
-        <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+        <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-12">
           <div>
-            <p className="label mb-4">What We Offer</p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+            <p className="label mb-3 md:mb-4">What We Offer</p>
+            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
               Solutions for Every Corner
             </h2>
           </div>
@@ -590,7 +590,7 @@ function Heritage() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="about" className="relative py-20 md:py-28 bg-linen overflow-hidden">
+    <section id="about" className="relative py-12 md:py-28 bg-linen overflow-hidden">
       {/* Watermark: घर (ghar = home) */}
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
@@ -602,13 +602,13 @@ function Heritage() {
       </div>
 
       <div ref={ref} className="container-wide relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-start">
 
           {/* Left — Timeline */}
           <div>
-            <Reveal className="mb-10">
-              <p className="label mb-4">Our Heritage</p>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
+            <Reveal className="mb-6 md:mb-10">
+              <p className="label mb-3 md:mb-4">Our Heritage</p>
+              <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-charcoal leading-tight">
                 Since 1998. One Craft. One Promise.
               </h2>
             </Reveal>
@@ -785,7 +785,7 @@ function ShowroomCTA() {
   return (
     <section
       id="contact"
-      className="relative py-20 md:py-28 bg-teal overflow-hidden"
+      className="relative py-12 md:py-28 bg-teal overflow-hidden"
     >
       {/* Subtle background gradient */}
       <div
@@ -797,12 +797,12 @@ function ShowroomCTA() {
       />
 
       <div className="container-wide relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-24 items-center">
 
           {/* Left — Heading + contact */}
           <Reveal variants={fadeUp}>
             <p className="label text-cream/50 mb-6">Come Visit Us</p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-cream leading-tight mb-10">
+            <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-cream leading-tight mb-6 md:mb-10">
               Come, see it<br />in person.
             </h2>
 
