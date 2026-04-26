@@ -2,10 +2,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import QRCode from 'qrcode'
 import { getProducts, getProductModelsByCategory, getBrands } from '../../../sanity/lib/queries'
+import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 import { PaginatedProductGrid } from './PaginatedProductGrid'
 import { GroupedProductGrid } from './GroupedProductGrid'
 import { CatalogueSection } from './CatalogueSection'
 import { APLogo } from '../../../components/APLogo'
+
+export const revalidate = 3600
 
 export async function generateStaticParams() {
   const products = await getProducts()
@@ -22,8 +25,6 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
     description: product.description,
   }
 }
-
-const WA_NUMBER = '919302104628'
 
 export default async function ProductCategoryPage({ params }: { params: Promise<{ category: string }> }) {
   const { category } = await params
@@ -58,7 +59,7 @@ export default async function ProductCategoryPage({ params }: { params: Promise<
     )
   ).filter((b): b is NonNullable<typeof b> => b !== null)
 
-  const waMessage = encodeURIComponent(
+  const waUrl = buildWhatsAppUrl(
     `Hi, I'm looking for ${product.title} solutions from AP Sanitations, Indore. Please get in touch.`
   )
 
@@ -86,7 +87,7 @@ export default async function ProductCategoryPage({ params }: { params: Promise<
 
         {/* WhatsApp CTA */}
         <a
-          href={`https://wa.me/${WA_NUMBER}?text=${waMessage}`}
+          href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 mt-8 bg-[#25D366] hover:bg-[#20bb5a] text-white rounded-xl px-6 py-3 transition-colors duration-300 font-sans font-medium text-sm"
@@ -104,14 +105,14 @@ export default async function ProductCategoryPage({ params }: { params: Promise<
             models={models}
             allBrands={allBrands}
             productTitle={product.title}
-            waMessage={waMessage}
+            waUrl={waUrl}
           />
         : <PaginatedProductGrid
             models={models}
             allBrands={allBrands}
             pageSize={10}
             productTitle={product.title}
-            waMessage={waMessage}
+            waUrl={waUrl}
             category={category}
           />
       }

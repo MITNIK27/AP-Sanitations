@@ -10,6 +10,7 @@ out/
 .env.local
 .env*.local
 
+
 # Sanity
 .sanity/
 
@@ -22,3 +23,6 @@ Thumbs.db
 
 # TypeScript
 tsconfig.tsbuildinfo
+
+#claude files
+.claude/

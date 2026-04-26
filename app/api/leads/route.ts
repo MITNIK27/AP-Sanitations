@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeClient } from '../../../sanity/lib/writeClient'
+import { sendLeadNotification, sendEnrichmentNotification } from '../../../lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,8 +10,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
     }
 
-    // Store lead in Sanity
-    await writeClient.create({
+    // 1. Dedup: return existing lead if the same phone submitted within the last 15 minutes
+    const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString()
+    const existing = await writeClient.fetch<{ _id: string } | null>(
+      `*[_type == "lead" && phone == $phone && submittedAt > $cutoff][0]{ _id }`,
+      { phone, cutoff }
+    )
+    if (existing) {
+      return NextResponse.json({ success: true, leadId: existing._id })
+    }
+
+    // 2. Write lead to Sanity — this must succeed before anything else
+    const doc = await writeClient.create({
       _type: 'lead',
       phone,
       source: source || 'contact-form',
@@ -18,13 +29,51 @@ export async function POST(req: NextRequest) {
       submittedAt: new Date().toISOString(),
     })
 
-    // TODO (Phase 3C): If whatsappOptIn, call AiSensy API here to send
-    // confirmation to customer and alert to Prem Sahni.
-    // Requires: AISENSY_API_KEY in .env.local + approved message templates.
+    // 2. Send alert email — best-effort, never blocks or fails the response
+    sendLeadNotification({
+      phone,
+      source: source || 'contact-form',
+      whatsappOptIn: whatsappOptIn ?? false,
+    }).catch((err) => {
+      console.error('[lead-notify] Email notification failed:', err)
+    })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, leadId: doc._id })
   } catch (err) {
     console.error('Lead submission error:', err)
     return NextResponse.json({ error: 'Failed to save lead' }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { leadId, name, email, productInterest } = await req.json()
+
+    if (!leadId || typeof leadId !== 'string') {
+      return NextResponse.json({ error: 'leadId is required' }, { status: 400 })
+    }
+
+    // Only patch fields that have actual values
+    const fields: Record<string, string> = {}
+    if (name?.trim())         fields.name = name.trim()
+    if (email?.trim())        fields.email = email.trim()
+    if (productInterest?.trim()) fields.productInterest = productInterest.trim()
+
+    // No meaningful data — nothing to do
+    if (Object.keys(fields).length === 0) {
+      return NextResponse.json({ success: true })
+    }
+
+    await writeClient.patch(leadId).set(fields).commit()
+
+    // Send follow-up enrichment email — best-effort
+    sendEnrichmentNotification({ leadId, ...fields }).catch((err: unknown) => {
+      console.error('[lead-enrich] Follow-up email failed:', err)
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('Lead enrichment error:', err)
+    return NextResponse.json({ error: 'Failed to update lead' }, { status: 500 })
   }
 }

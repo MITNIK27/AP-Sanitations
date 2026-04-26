@@ -5,19 +5,18 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import type { ProductModel } from '../../../sanity/lib/queries'
 import type { Brand } from '../../../data/brands'
-
-const WA_NUMBER = '919302104628'
+import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 
 interface Props {
   models: ProductModel[]
   allBrands: Brand[]
   pageSize: number
   productTitle: string
-  waMessage: string
+  waUrl: string
   category: string
 }
 
-export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle, waMessage, category }: Props) {
+export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle, waUrl, category }: Props) {
   const router = useRouter()
   const totalPages = Math.ceil(models.length / pageSize)
 
@@ -53,7 +52,7 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
             Contact us for the full range.
           </p>
           <a
-            href={`https://wa.me/${WA_NUMBER}?text=${waMessage}`}
+            href={waUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#20bb5a] text-white rounded-xl px-5 py-3 transition-colors duration-300 font-sans font-medium text-sm"
@@ -129,7 +128,7 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
                 )}
                 <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
                   <a
-                    href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hi, I'm interested in the ${model.name} from AP Sanitations. Please share more details.`)}`}
+                    href={buildWhatsAppUrl(`Hi, I'm interested in the ${model.name} from AP Sanitations, Indore. Please share more details.`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 text-center bg-[#25D366]/10 hover:bg-[#25D366]/20 text-charcoal text-xs font-sans font-medium py-2 rounded-lg transition-colors duration-300"
