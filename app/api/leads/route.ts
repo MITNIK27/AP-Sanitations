@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { writeClient } from '../../../sanity/lib/writeClient'
-import { sendLeadNotification, sendEnrichmentNotification, sendUserConfirmation } from '../../../lib/email'
+import { sendLeadNotification, sendEnrichmentNotification } from '../../../lib/email'
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,17 +66,10 @@ export async function PATCH(req: NextRequest) {
 
     await writeClient.patch(leadId).set(fields).commit()
 
-    // Send admin enrichment alert — best-effort
+    // Send follow-up enrichment email — best-effort
     sendEnrichmentNotification({ leadId, ...fields }).catch((err: unknown) => {
       console.error('[lead-enrich] Follow-up email failed:', err)
     })
-
-    // Send user confirmation — only when email is present, best-effort
-    if (fields.email) {
-      sendUserConfirmation({ name: fields.name, email: fields.email }).catch((err: unknown) => {
-        console.error('[user-confirm] Confirmation email failed:', err)
-      })
-    }
 
     return NextResponse.json({ success: true })
   } catch (err) {
