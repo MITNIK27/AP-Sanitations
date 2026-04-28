@@ -36,8 +36,24 @@ export default function LenisProvider({
 
     rafId = requestAnimationFrame(raf);
 
+    // Intercept all in-page anchor clicks so Lenis handles the scroll
+    // instead of the browser jumping instantly.
+    function handleAnchorClick(e: MouseEvent) {
+      const anchor = (e.target as Element).closest('a[href^="#"]') as HTMLAnchorElement | null;
+      if (!anchor) return;
+      const hash = anchor.getAttribute('href');
+      if (!hash || hash === '#') return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+      e.preventDefault();
+      lenis.scrollTo(target as HTMLElement, { duration: 1.4 });
+    }
+
+    document.addEventListener('click', handleAnchorClick);
+
     return () => {
       cancelAnimationFrame(rafId);
+      document.removeEventListener('click', handleAnchorClick);
       lenis.destroy();
     };
   }, []);
