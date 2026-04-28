@@ -90,24 +90,6 @@ function IconArrow({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function IconInstagram({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function IconFacebook({ className = "w-5 h-5" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
-    </svg>
-  );
-}
-
 // ─── 1. Navbar ────────────────────────────────────────────────────────────────
 
 const navLinks = [
@@ -286,6 +268,11 @@ function Hero() {
           animate="visible"
           className="max-w-md relative"
         >
+          {/* Label */}
+          <motion.p variants={fadeUp} className="label mb-3 md:mb-6">
+            Est.&nbsp;2003&nbsp;&nbsp;·&nbsp;&nbsp;Indore
+          </motion.p>
+
           {/* Headline */}
           <motion.h1
             variants={fadeUp}
@@ -325,7 +312,7 @@ function PhilosophyStrip() {
     <Reveal variants={fadeIn}>
       <div className="bg-charcoal py-5 overflow-hidden">
         <p className="text-center label text-cream/40">
-          Samyak Park Building,
+          Est.&nbsp;2003&nbsp;&nbsp;·&nbsp;&nbsp;Samyak Park Building,
           Indore&nbsp;&nbsp;·&nbsp;&nbsp;Authorized
           Dealer&nbsp;&nbsp;·&nbsp;&nbsp;Signature Brand Collection
         </p>
@@ -409,7 +396,7 @@ function BrandStrip({
       {/* Text side */}
       <div
         className={`flex w-full md:w-[60%] flex-col justify-center py-10 md:py-0 ${
-          isImageLeft ? 'px-5 sm:px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 md:px-10 lg:px-12'
+          isImageLeft ? 'px-5 sm:px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 lg:px-12'
         } ${
           index % 2 === 0 ? "bg-cream" : "bg-linen"
         }`}
@@ -423,14 +410,12 @@ function BrandStrip({
           <motion.p variants={fadeUp} className="label mb-5">
             Brand Partner
           </motion.p>
-          <a href={`/brands/${brand.id}`} className="block group/heading">
-            <motion.h2
-              variants={fadeUp}
-              className="font-display text-4xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 group-hover/heading:text-gold"
-            >
-              {brand.name}
-            </motion.h2>
-          </a>
+          <motion.h2
+            variants={fadeUp}
+            className="font-display text-4xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 hover:text-gold cursor-default"
+          >
+            {brand.name}
+          </motion.h2>
           <motion.p variants={fadeUp} className="font-sans text-stone text-sm mb-6 leading-relaxed">
             {brand.tagline}
           </motion.p>
@@ -451,7 +436,7 @@ function BrandShowcase({ brands }: { brands: Brand[] }) {
   return (
     <section id="brands">
       {/* Section header */}
-      <div className="container-wide py-8 md:py-14">
+      <div className="container-wide py-10 md:py-24">
         <Reveal className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
             <p className="label mb-3 md:mb-4">Our Brands</p>
@@ -538,10 +523,10 @@ function Products({ products }: { products: Product[] }) {
           </p>
         </Reveal>
 
-        {/* Bento grid — 3 cols, 2 rows, Z-pattern */}
+        {/* Bento grid — 3 cols, 3 rows */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 auto-rows-[28rem] md:auto-rows-[22rem]">
-          {/* 01 Wellness & Spa — col 1-2, row 1 */}
-          <div className="md:col-span-2 md:row-span-1 h-full">
+          {/* 01 Wellness & Spa — col 1-2, row 1-2 */}
+          <div className="md:col-span-2 md:row-span-2 h-full">
             <ProductCard product={products[0]} />
           </div>
 
@@ -550,17 +535,20 @@ function Products({ products }: { products: Product[] }) {
             <ProductCard product={products[1]} />
           </div>
 
-          {/* 03 Kitchen Harmony — col 1, row 2 */}
+          {/* 03 Kitchen Harmony — col 3, row 2 */}
           <div className="md:col-span-1 md:row-span-1 h-full">
             <ProductCard product={products[2]} />
           </div>
 
-          {/* 04 Swimming Pool — col 2-3, row 2 */}
+          {/* 04 Swimming Pool — col 1-2, row 3 */}
           <div className="md:col-span-2 md:row-span-1 h-full">
             <ProductCard product={products[3]} />
           </div>
 
-          {/* 05 Invisible Infrastructure — hidden until content is ready */}
+          {/* 05 Invisible Infrastructure — col 3, row 3 */}
+          <div className="md:col-span-1 md:row-span-1 h-full">
+            <ProductCard product={products[4]} />
+          </div>
         </div>
       </div>
     </section>
@@ -735,18 +723,6 @@ function ShowroomCTA() {
   const [enrichEmail, setEnrichEmail] = useState("");
   const [enrichEmailError, setEnrichEmailError] = useState("");
   const [enrichProduct, setEnrichProduct] = useState("");
-  const [enrichProductOpen, setEnrichProductOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const productOptions = [
-    { value: 'wellness-spa',     label: 'Wellness & Spa' },
-    { value: 'pure-life',        label: 'Pure Life (Water Purifiers)' },
-    { value: 'kitchen-harmony',  label: 'Kitchen Harmony' },
-    { value: 'swimming-pool',    label: 'Swimming Pool Systems' },
-    { value: 'shower-systems',   label: 'Shower Systems' },
-    { value: 'bathroom-faucets', label: 'Bathroom Faucets' },
-    { value: 'bathtubs',         label: 'Bathtubs' },
-  ];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -805,16 +781,6 @@ function ShowroomCTA() {
     }
   }
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setEnrichProductOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const enrichHasData = enrichName.trim() !== "" || enrichEmail.trim() !== "" || enrichProduct !== "";
 
   const waMessage = encodeURIComponent(
@@ -849,11 +815,11 @@ function ShowroomCTA() {
               {/* Mobile */}
               <a
                 href="tel:9302104628"
-                className="group flex items-start gap-4 text-cream hover:text-cream transition-colors duration-400"
+                className="group flex items-start gap-4 text-cream/80 hover:text-cream transition-colors duration-400"
               >
                 <IconPhone className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
                 <div>
-                  <p className="label text-cream/60 mb-1">Mobile</p>
+                  <p className="label text-cream/40 mb-1">Mobile</p>
                   <p className="font-sans font-medium text-lg group-hover:text-gold transition-colors duration-400">
                     +91 9302104628
                   </p>
@@ -863,11 +829,11 @@ function ShowroomCTA() {
               {/* Landline */}
               <a
                 href="tel:07314038838"
-                className="group flex items-start gap-4 text-cream hover:text-cream transition-colors duration-400"
+                className="group flex items-start gap-4 text-cream/80 hover:text-cream transition-colors duration-400"
               >
                 <IconPhone className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
                 <div>
-                  <p className="label text-cream/60 mb-1">Landline</p>
+                  <p className="label text-cream/40 mb-1">Landline</p>
                   <p className="font-sans font-medium text-lg group-hover:text-gold transition-colors duration-400">
                     0731-4038838
                   </p>
@@ -875,22 +841,16 @@ function ShowroomCTA() {
               </a>
 
               {/* Address */}
-              <a
-                href="https://maps.google.com/?q=LG-4,31,Samyak+Park+Building,Nehru+Park+Rd,Builders+Colony,Indore,Madhya+Pradesh+452003"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-start gap-4 text-cream hover:text-cream transition-colors duration-400"
-              >
+              <div className="flex items-start gap-4 text-cream/80">
                 <IconMapPin className="w-5 h-5 mt-0.5 flex-shrink-0 text-gold" />
                 <div>
-                  <p className="label text-cream/60 mb-1">Our Showroom</p>
-                  <p className="font-sans text-sm leading-relaxed group-hover:text-gold transition-colors duration-400">
-                    LG-4, 31, Samyak Park Building,<br />
-                    Nehru Park Rd, Builders Colony,<br />
-                    Indore, Madhya Pradesh 452003
+                  <p className="label text-cream/40 mb-1">Our Showroom</p>
+                  <p className="font-sans text-sm leading-relaxed">
+                    Samyak Park Building,<br />
+                    Indore, Madhya Pradesh 452001
                   </p>
                 </div>
-              </a>
+              </div>
             </div>
           </Reveal>
 
@@ -958,64 +918,37 @@ function ShowroomCTA() {
                           {enrichEmailError && (
                             <p className="font-sans text-red-300 text-xs -mt-1">{enrichEmailError}</p>
                           )}
-                          {/* Custom accessible dropdown */}
-                          <div ref={dropdownRef} className="relative">
-                            <button
-                              type="button"
-                              onClick={() => setEnrichProductOpen(!enrichProductOpen)}
-                              onKeyDown={(e) => { if (e.key === 'Escape') setEnrichProductOpen(false); }}
-                              className="editorial-input w-full text-left flex items-center justify-between cursor-pointer"
-                              style={{ color: enrichProduct ? '#F7F5F0' : 'rgba(247,245,240,0.4)' }}
-                              aria-haspopup="listbox"
-                              aria-expanded={enrichProductOpen}
+                          {/* Custom-styled select — wrapped for chevron overlay */}
+                          <div className="relative">
+                            <select
+                              value={enrichProduct}
+                              onChange={(e) => setEnrichProduct(e.target.value)}
+                              className="editorial-input appearance-none cursor-pointer"
+                              style={{
+                                backgroundColor: '#446f6a',
+                                color: enrichProduct ? '#F7F5F0' : 'rgba(253,252,250,0.4)',
+                              }}
                               aria-label="What are you looking for?"
                             >
-                              <span>
-                                {enrichProduct
-                                  ? productOptions.find(o => o.value === enrichProduct)?.label
-                                  : 'What are you looking for?'}
-                              </span>
-                              <motion.svg
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                className="w-4 h-4 text-cream/40 flex-shrink-0"
-                                animate={{ rotate: enrichProductOpen ? 180 : 0 }}
-                                transition={{ duration: 0.2 }}
-                                aria-hidden="true"
-                              >
-                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                              </motion.svg>
-                            </button>
-                            <AnimatePresence>
-                              {enrichProductOpen && (
-                                <motion.ul
-                                  initial={{ opacity: 0, y: 6 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: 6 }}
-                                  transition={{ duration: 0.18, ease: 'easeOut' }}
-                                  role="listbox"
-                                  aria-label="Product interest options"
-                                  className="absolute z-20 w-full bottom-full mb-2 rounded-lg overflow-y-auto shadow-2xl border border-cream/10"
-                                  style={{ backgroundColor: '#2A4D49', maxHeight: '13rem' }}
-                                >
-                                  {productOptions.map((opt) => (
-                                    <li
-                                      key={opt.value}
-                                      role="option"
-                                      aria-selected={enrichProduct === opt.value}
-                                      onClick={() => { setEnrichProduct(opt.value); setEnrichProductOpen(false); }}
-                                      className={`px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
-                                        enrichProduct === opt.value
-                                          ? 'text-cream bg-white/15'
-                                          : 'text-cream/70 hover:text-cream hover:bg-white/10'
-                                      }`}
-                                    >
-                                      {opt.label}
-                                    </li>
-                                  ))}
-                                </motion.ul>
-                              )}
-                            </AnimatePresence>
+                              <option value=""        style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>What are you looking for?</option>
+                              <option value="wellness-spa"              style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Wellness &amp; Spa</option>
+                              <option value="pure-life"                 style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Pure Life (Water Purifiers)</option>
+                              <option value="kitchen-harmony"           style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Kitchen Harmony</option>
+                              <option value="swimming-pool"             style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Swimming Pool Systems</option>
+                              <option value="invisible-infrastructure"  style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Invisible Infrastructure</option>
+                              <option value="shower-systems"            style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Shower Systems</option>
+                              <option value="bathroom-faucets"          style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Bathroom Faucets</option>
+                              <option value="bathtubs"                  style={{ backgroundColor: '#2A4D49', color: '#F7F5F0' }}>Bathtubs</option>
+                            </select>
+                            {/* Custom chevron — replaces browser arrow removed by appearance-none */}
+                            <svg
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              className="pointer-events-none absolute right-0 bottom-3.5 w-4 h-4 text-cream/40"
+                              aria-hidden="true"
+                            >
+                              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
                           </div>
                         </div>
                         <div className="flex items-center gap-4 mt-4">
@@ -1085,7 +1018,7 @@ function ShowroomCTA() {
                       <p className="font-sans text-red-300 text-xs">{error}</p>
                     )}
                     <p className="font-sans text-cream/30 text-xs">
-                      Your number stays private. One call, no pressure.
+                      No spam. We&apos;ll reach out once to understand your needs.
                     </p>
                   </form>
                 </>
@@ -1103,67 +1036,34 @@ function ShowroomCTA() {
 function Footer({ brands }: { brands: Brand[] }) {
   return (
     <footer className="bg-charcoal text-cream">
-      {/* Logo + Social */}
-      <div className="container-wide pt-10 md:pt-14 pb-6 border-b border-stone/20 flex items-center justify-between gap-4">
+      {/* Logo */}
+      <div className="container-wide pt-16 md:pt-20 pb-10 border-b border-stone/20">
         <APLogo size="xl" variant="dark" tagline />
-        <div className="flex items-center gap-4 flex-shrink-0">
-          <a
-            href="https://www.instagram.com/ap.sanitations?igsh=MzhpaWJxNzhweWJy"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="AP Sanitations on Instagram"
-            className="text-stone/50 hover:text-gold transition-colors duration-400"
-          >
-            <IconInstagram />
-          </a>
-          <a
-            href="https://www.facebook.com/share/1Azv17EbjN/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="AP Sanitations on Facebook"
-            className="text-stone/50 hover:text-gold transition-colors duration-400"
-          >
-            <IconFacebook />
-          </a>
-        </div>
       </div>
 
       {/* 3-col info */}
-      <div className="container-wide py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="container-wide py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           {/* Address */}
           <div>
             <p className="label text-stone mb-4">Showroom</p>
-            <address className="font-sans text-sm text-stone not-italic leading-relaxed space-y-2">
+            <address className="font-sans text-sm text-stone not-italic leading-relaxed">
+              Samyak Park Building,<br />
+              Indore, Madhya Pradesh 452001<br />
               <a
-                href="https://maps.google.com/?q=LG-4,31,Samyak+Park+Building,Nehru+Park+Rd,Builders+Colony,Indore,Madhya+Pradesh+452003"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-start gap-1.5 hover:text-gold transition-colors duration-400 group"
+                href="tel:9302104628"
+                className="text-cream/70 hover:text-gold transition-colors duration-400 mt-2 inline-block"
               >
-                <IconMapPin className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-gold/60 group-hover:text-gold transition-colors duration-400" />
-                <span>
-                  LG-4, 31, Samyak Park Building,<br />
-                  Nehru Park Rd, Builders Colony,<br />
-                  Indore, Madhya Pradesh 452003
-                </span>
+                +91 9302104628
               </a>
-              <div>
-                <a
-                  href="tel:9302104628"
-                  className="text-cream/70 hover:text-gold transition-colors duration-400 inline-block"
-                >
-                  +91 9302104628
-                </a>
-                <br />
-                <a
-                  href="tel:07314038838"
-                  className="text-cream/70 hover:text-gold transition-colors duration-400 mt-1 inline-block"
-                >
-                  0731-4038838
-                </a>
-              </div>
+              <br />
+              <a
+                href="tel:07314038838"
+                className="text-cream/70 hover:text-gold transition-colors duration-400 mt-1 inline-block"
+              >
+                0731-4038838
+              </a>
             </address>
           </div>
 
@@ -1200,13 +1100,13 @@ function Footer({ brands }: { brands: Brand[] }) {
 
       {/* Copyright */}
       <div className="container-wide pb-8">
-        <div className="border-t border-stone/20 pt-6 flex flex-col items-center gap-2">
-          <p className="font-sans text-xs text-stone/50 text-center">
+        <div className="border-t border-stone/20 pt-6 flex flex-col md:flex-row md:justify-between gap-2">
+          <p className="font-sans text-xs text-stone/50">
             © {new Date().getFullYear()} AP Sanitations, Indore. All rights reserved.
           </p>
-          {/* <p className="font-sans text-xs text-stone/30">
+          <p className="font-sans text-xs text-stone/30">
             Crafted with care.
-          </p> */}
+          </p>
         </div>
       </div>
     </footer>
