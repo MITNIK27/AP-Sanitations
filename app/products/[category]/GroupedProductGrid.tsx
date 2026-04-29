@@ -6,6 +6,8 @@ import type { ProductModel } from '../../../sanity/lib/queries'
 import type { Brand } from '../../../data/brands'
 import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 import { BRAND_LOGOS } from '../../../lib/brandLogos'
+import { PRODUCT_IMAGES } from '../../../lib/productImages'
+import { PRODUCT_IMAGE_CONTAIN } from '../../../lib/productImageFit'
 
 interface Props {
   models: ProductModel[]
@@ -14,11 +16,18 @@ interface Props {
   waUrl: string
   category: string
   selectedSeries?: string
+  basePath?: string
+  backPath?: string
 }
 
-function ProductCard({ model, allBrands, router }: { model: ProductModel; allBrands: Brand[]; router: ReturnType<typeof useRouter> }) {
+function ProductCard({ model, allBrands, router, backPath }: { model: ProductModel; allBrands: Brand[]; router: ReturnType<typeof useRouter>; backPath?: string }) {
   const brandCatalogueUrl = allBrands.find((b) => b.id === model.brandId)?.catalogueUrl
-  const detailHref = `/products/${model.category}/${model._id}`
+  const staticSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
+  const effectiveSrc = staticSrc ?? model.imageSrc
+  const useContain = staticSrc != null || PRODUCT_IMAGE_CONTAIN.has(model._id)
+  const detailHref = backPath
+    ? `/products/${model.category}/${model._id}?back=${encodeURIComponent(backPath)}`
+    : `/products/${model.category}/${model._id}`
   const brandLogo = allBrands.find((b) => b.id === model.brandId)?.imageSrc
 
   return (
@@ -32,13 +41,13 @@ function ProductCard({ model, allBrands, router }: { model: ProductModel; allBra
     >
       {/* Image */}
       <div className="relative aspect-[4/3] bg-linen overflow-hidden">
-        {model.imageSrc ? (
+        {effectiveSrc ? (
           <Image
-            src={model.imageSrc}
+            src={effectiveSrc}
             alt={model.name}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className={useContain ? 'object-contain p-4' : 'object-cover group-hover:scale-105 transition-transform duration-500'}
           />
         ) : (BRAND_LOGOS[model.brandId] ?? brandLogo) ? (
           <Image
@@ -97,7 +106,7 @@ function ProductCard({ model, allBrands, router }: { model: ProductModel; allBra
   )
 }
 
-export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, category, selectedSeries }: Props) {
+export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, category, selectedSeries, basePath, backPath }: Props) {
   const router = useRouter()
 
   if (models.length === 0) {
@@ -147,7 +156,7 @@ export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, cat
         {/* Back navigation */}
         <div className="mb-8 flex items-center gap-4">
           <a
-            href={`/products/${category}`}
+            href={basePath ?? `/products/${category}`}
             className="inline-flex items-center gap-2 font-sans text-sm text-stone hover:text-charcoal transition-colors duration-300"
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 flex-shrink-0">
@@ -164,7 +173,7 @@ export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, cat
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {seriesItems.map((model) => (
-            <ProductCard key={model._id} model={model} allBrands={allBrands} router={router} />
+            <ProductCard key={model._id} model={model} allBrands={allBrands} router={router} backPath={backPath} />
           ))}
         </div>
       </section>
@@ -180,13 +189,15 @@ export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, cat
       {namedGroups.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
           {namedGroups.map(({ subCategory, items }) => {
-            const repImage = items.find((m) => m.imageSrc)?.imageSrc
+            const repImage = items
+              .map((m) => PRODUCT_IMAGES[m._id] ?? PRODUCT_IMAGES[m.name] ?? m.imageSrc)
+              .find(Boolean)
             const brandLogo = allBrands.find((b) => b.id === items[0]?.brandId)?.imageSrc
 
             return (
               <a
                 key={subCategory}
-                href={`/products/${category}?series=${encodeURIComponent(subCategory)}`}
+                href={`${basePath ?? `/products/${category}`}?series=${encodeURIComponent(subCategory)}`}
                 className="group bg-warmWhite rounded-2xl overflow-hidden border border-stone/10 hover:border-gold/30 transition-colors duration-300 flex flex-col"
               >
                 {/* Representative image */}
@@ -241,7 +252,7 @@ export function GroupedProductGrid({ models, allBrands, productTitle, waUrl, cat
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {ungrouped.items.map((model) => (
-              <ProductCard key={model._id} model={model} allBrands={allBrands} router={router} />
+              <ProductCard key={model._id} model={model} allBrands={allBrands} router={router} backPath={backPath} />
             ))}
           </div>
         </div>

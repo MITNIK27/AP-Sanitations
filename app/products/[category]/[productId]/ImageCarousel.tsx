@@ -6,9 +6,10 @@ import Image from 'next/image'
 interface Props {
   images: string[]
   alt: string
+  objectFit?: 'cover' | 'contain'
 }
 
-export function ImageCarousel({ images, alt }: Props) {
+export function ImageCarousel({ images, alt, objectFit = 'cover' }: Props) {
   const [idx, setIdx] = useState(0)
 
   const prev = useCallback(() => setIdx((i) => (i === 0 ? images.length - 1 : i - 1)), [images.length])
@@ -22,10 +23,12 @@ export function ImageCarousel({ images, alt }: Props) {
 
   if (images.length === 0) return null
 
+  const imgClass = objectFit === 'contain' ? 'object-contain p-6' : 'object-cover'
+
   if (images.length === 1) {
     return (
       <div className="relative w-full aspect-[16/9] md:aspect-[21/9] bg-linen">
-        <Image src={images[0]} alt={alt} fill priority sizes="100vw" className="object-cover" />
+        <Image src={images[0]} alt={alt} fill priority sizes="100vw" className={imgClass} />
       </div>
     )
   }
@@ -37,7 +40,7 @@ export function ImageCarousel({ images, alt }: Props) {
           key={src}
           className={`absolute inset-0 transition-opacity duration-700 ${i === idx ? 'opacity-100' : 'opacity-0'}`}
         >
-          <Image src={src} alt={`${alt} ${i + 1}`} fill sizes="100vw" className="object-cover" priority={i === 0} />
+          <Image src={src} alt={`${alt} ${i + 1}`} fill sizes="100vw" className={imgClass} priority={i === 0} />
         </div>
       ))}
 

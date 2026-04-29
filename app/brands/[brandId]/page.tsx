@@ -5,6 +5,8 @@ import { getBrandBySlug, getBrands, getProductModelsByBrand } from '../../../san
 import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 import { BRAND_LOGOS } from '../../../lib/brandLogos'
 import { CATEGORY_LABELS } from '../../../lib/categoryLabels'
+import { PRODUCT_IMAGES } from '../../../lib/productImages'
+import { PRODUCT_IMAGE_CONTAIN } from '../../../lib/productImageFit'
 import { BrandCatalogues } from './BrandCatalogues'
 import { APLogo } from '../../../components/APLogo'
 import { SearchTriggerButton } from '../../../components/SearchTriggerButton'
@@ -176,7 +178,7 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
                           {CATEGORY_LABELS[cat] ?? cat}
                         </h2>
                         <Link
-                          href={`/products/${cat}`}
+                          href={`/brands/${brandId}/${cat}`}
                           className="font-sans text-sm text-stone hover:text-gold transition-colors duration-300 flex items-center gap-1.5"
                         >
                           View all {group.length}
@@ -187,20 +189,24 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
                       </div>
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {preview.map((model) => (
+                      {preview.map((model) => {
+                        const overrideSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
+                        const effectiveSrc = overrideSrc ?? model.imageSrc
+                        const useContain = overrideSrc != null || PRODUCT_IMAGE_CONTAIN.has(model._id)
+                        return (
                         <Link
                           key={model._id}
-                          href={`/products/${model.category}/${model._id}`}
+                          href={`/products/${model.category}/${model._id}?back=/brands/${brandId}`}
                           className="group border border-stone/15 hover:border-gold/40 rounded-2xl overflow-hidden transition-colors duration-300 bg-warmWhite"
                         >
-                          {model.imageSrc ? (
+                          {effectiveSrc ? (
                             <div className="relative aspect-[4/3] bg-linen">
                               <Image
-                                src={model.imageSrc}
+                                src={effectiveSrc}
                                 alt={model.name}
                                 fill
                                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                className={useContain ? 'object-contain p-4' : 'object-cover group-hover:scale-105 transition-transform duration-500'}
                               />
                             </div>
                           ) : (
@@ -228,12 +234,13 @@ export default async function BrandPage({ params }: { params: Promise<{ brandId:
                             )}
                           </div>
                         </Link>
-                      ))}
+                      )
+                      })}
                     </div>
                     {remaining > 0 && (
                       <div className="mt-6 text-center">
                         <Link
-                          href={`/products/${cat}`}
+                          href={`/brands/${brandId}/${cat}`}
                           className="inline-flex items-center gap-2 border border-stone/20 hover:border-gold hover:text-gold text-stone text-sm font-sans font-medium py-3 px-6 rounded-xl transition-colors duration-300"
                         >
                           +{remaining} more in {CATEGORY_LABELS[cat] ?? cat}

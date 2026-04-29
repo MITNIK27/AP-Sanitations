@@ -162,3 +162,40 @@ export async function getAllProductModelsForSearch(): Promise<ProductModelSearch
     }`
   )
 }
+
+export async function getProductModelsByBrandAndCategory(
+  brandSlug: string,
+  category: string
+): Promise<ProductModel[]> {
+  return client.fetch(
+    `*[_type == "productModel" && brand->id.current == $brandSlug && category == $category] | order(order asc) {
+      _id,
+      name,
+      "brandName": brand->name,
+      "brandId": brand->id.current,
+      category,
+      subCategory,
+      "imageSrc": image.asset->url,
+      description,
+      features,
+      order,
+    }`,
+    { brandSlug, category }
+  )
+}
+
+export async function getAllBrandCategoryPairs(): Promise<{ brandId: string; category: string }[]> {
+  const pairs: { brandId: string; category: string }[] = await client.fetch(
+    `*[_type == "productModel"] {
+      "brandId": brand->id.current,
+      category,
+    }`
+  )
+  const seen = new Set<string>()
+  return pairs.filter(({ brandId, category }) => {
+    const key = `${brandId}::${category}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
