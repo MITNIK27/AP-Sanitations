@@ -7,6 +7,8 @@ import type { ProductModel } from '../../../sanity/lib/queries'
 import type { Brand } from '../../../data/brands'
 import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 import { BRAND_LOGOS } from '../../../lib/brandLogos'
+import { PRODUCT_IMAGES } from '../../../lib/productImages'
+import { PRODUCT_IMAGE_CONTAIN } from '../../../lib/productImageFit'
 
 interface Props {
   models: ProductModel[]
@@ -15,9 +17,10 @@ interface Props {
   productTitle: string
   waUrl: string
   category: string
+  backPath?: string
 }
 
-export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle, waUrl, category }: Props) {
+export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle, waUrl, category, backPath }: Props) {
   const router = useRouter()
   const totalPages = Math.ceil(models.length / pageSize)
 
@@ -70,7 +73,7 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
       <div className="flex items-center justify-between mb-8">
         <p className="label text-stone">Products</p>
         {totalPages > 1 && (
-          <p className="font-sans text-xs text-stone/50">
+          <p className="font-sans text-xs text-stone/50"> 
             Page {page + 1} of {totalPages}
           </p>
         )}
@@ -79,7 +82,12 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {visibleModels.map((model) => {
           const brandCatalogueUrl = allBrands.find((b) => b.id === model.brandId)?.catalogueUrl
-          const detailHref = `/products/${model.category}/${model._id}`
+          const staticSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
+          const effectiveSrc = staticSrc ?? model.imageSrc
+          const useContain = staticSrc != null || PRODUCT_IMAGE_CONTAIN.has(model._id)
+          const detailHref = backPath
+            ? `/products/${model.category}/${model._id}?back=${encodeURIComponent(backPath)}`
+            : `/products/${model.category}/${model._id}`
           return (
             <div
               key={model._id}
@@ -91,13 +99,13 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
             >
               {/* Image */}
               <div className="relative aspect-[4/3] bg-linen overflow-hidden">
-                {model.imageSrc ? (
+                {effectiveSrc ? (
                   <Image
-                    src={model.imageSrc}
+                    src={effectiveSrc}
                     alt={model.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className={useContain ? 'object-contain p-4' : 'object-cover group-hover:scale-105 transition-transform duration-500'}
                   />
                 ) : (() => {
                   const logoSrc = BRAND_LOGOS[model.brandId] ?? allBrands.find((b) => b.id === model.brandId)?.imageSrc

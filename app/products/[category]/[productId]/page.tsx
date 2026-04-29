@@ -5,6 +5,9 @@ import QRCode from 'qrcode'
 import { getProductModelById, getAllProductModels } from '../../../../sanity/lib/queries'
 import { buildWhatsAppUrl } from '../../../../lib/whatsapp'
 import { CATEGORY_LABELS } from '../../../../lib/categoryLabels'
+import { PRODUCT_IMAGES } from '../../../../lib/productImages'
+import { PRODUCT_GALLERIES } from '../../../../lib/productGalleries'
+import { PRODUCT_IMAGE_CONTAIN } from '../../../../lib/productImageFit'
 import { ImageCarousel } from './ImageCarousel'
 import { APLogo } from '../../../../components/APLogo'
 
@@ -28,10 +31,13 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
 
 export default async function ProductDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ category: string; productId: string }>
+  searchParams: Promise<{ back?: string }>
 }) {
   const { category, productId } = await params
+  const { back } = await searchParams
   const model = await getProductModelById(productId)
   if (!model) notFound()
 
@@ -53,6 +59,16 @@ export default async function ProductDetailPage({
   )
 
   const categoryLabel = CATEGORY_LABELS[category] ?? category
+  const backHref = back ?? `/products/${category}`
+  const backLabel = back ? 'Back' : `Back to ${categoryLabel}`
+
+  const staticGallery = PRODUCT_GALLERIES[model._id] ?? PRODUCT_GALLERIES[model.name]
+  const effectiveGallery = (model.gallery && model.gallery.length > 0)
+    ? model.gallery
+    : (staticGallery ?? [])
+  const staticImageSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
+  const effectiveImageSrc = staticImageSrc ?? model.imageSrc
+  const heroObjectFit: 'cover' | 'contain' = (staticGallery || staticImageSrc || PRODUCT_IMAGE_CONTAIN.has(model._id)) ? 'contain' : 'cover'
 
   return (
     <main className="min-h-screen bg-cream text-charcoal">
@@ -60,13 +76,13 @@ export default async function ProductDetailPage({
       {/* Nav bar */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-5 bg-cream/95 backdrop-blur-sm border-b border-stone/10">
         <Link
-          href={`/products/${category}`}
+          href={backHref}
           className="font-sans text-sm text-stone hover:text-charcoal transition-colors duration-300 flex items-center gap-2"
         >
           <svg viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
             <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
           </svg>
-          Back to {categoryLabel}
+          {backLabel}
         </Link>
         <Link href="/" className="hover:opacity-75 transition-opacity duration-300">
           <APLogo size="sm" variant="light" />
@@ -75,17 +91,17 @@ export default async function ProductDetailPage({
 
       {/* Hero — carousel if gallery exists, single image otherwise */}
       <div className="relative mt-20">
-        {(model.gallery && model.gallery.length > 0) ? (
+        {effectiveGallery.length > 0 ? (
           <div className="relative">
-            <ImageCarousel images={model.gallery} alt={model.name} />
+            <ImageCarousel images={effectiveGallery} alt={model.name} objectFit={heroObjectFit} />
             <span className="absolute top-5 left-5 z-10 bg-charcoal/70 backdrop-blur-sm text-cream text-sm font-sans px-3 py-1.5 rounded-lg">
               {model.brandName}
             </span>
           </div>
         ) : (
           <div className="relative w-full aspect-[16/9] md:aspect-[21/9] bg-linen">
-            {model.imageSrc ? (
-              <Image src={model.imageSrc} alt={model.name} fill priority sizes="100vw" className="object-cover" />
+            {effectiveImageSrc ? (
+              <Image src={effectiveImageSrc} alt={model.name} fill priority sizes="100vw" className={heroObjectFit === 'contain' ? 'object-contain p-6' : 'object-cover'} />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-stone/20">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-20 h-20">
