@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type { ProductModel } from '../../../sanity/lib/queries'
 import type { Brand } from '../../../data/brands'
 import { buildWhatsAppUrl } from '../../../lib/whatsapp'
+import { BRAND_LOGOS } from '../../../lib/brandLogos'
 
 interface Props {
   models: ProductModel[]
@@ -98,13 +99,20 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center text-stone/30">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-12 h-12">
-                      <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                )}
+                ) : (() => {
+                  const logoSrc = BRAND_LOGOS[model.brandId] ?? allBrands.find((b) => b.id === model.brandId)?.imageSrc
+                  return logoSrc ? (
+                    <Image
+                      src={logoSrc}
+                      alt={model.brandName}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-contain p-8 opacity-70"
+                    />
+                  ) : (
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, #EDE9E1 0%, #F7F5F0 100%)' }} />
+                  )
+                })()}
                 <span className="absolute top-3 left-3 bg-charcoal/70 backdrop-blur-sm text-cream text-xs font-sans px-2 py-1 rounded-md">
                   {model.brandName}
                 </span>
