@@ -345,7 +345,9 @@ function BrandStrip({
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const isImageLeft = brand.layout === "image-left";
+  const isImageLeft = brand.layout
+    ? brand.layout === "image-left"
+    : index % 2 === 0;
 
   return (
     <motion.div
@@ -355,7 +357,7 @@ function BrandStrip({
       animate={inView ? "visible" : "hidden"}
       className={`flex flex-col ${
         isImageLeft ? "md:flex-row" : "md:flex-row-reverse"
-      } min-h-[60vh] border-b border-stone/10`}
+      } min-h-[60vh] rounded-2xl overflow-hidden border border-stone/10 hover:border-stone/20 transition-colors duration-400`}
     >
       {/* Image / Video side */}
       <div
@@ -408,7 +410,7 @@ function BrandStrip({
 
       {/* Text side */}
       <div
-        className={`flex w-full md:w-[60%] flex-col justify-center py-10 md:py-0 ${
+        className={`flex w-full md:w-[60%] flex-col justify-center py-10 md:py-14 lg:py-16 ${
           isImageLeft ? 'px-5 sm:px-8 md:px-14 lg:px-20' : 'px-5 sm:px-8 md:px-10 lg:px-12'
         } ${
           index % 2 === 0 ? "bg-cream" : "bg-linen"
@@ -418,15 +420,15 @@ function BrandStrip({
           variants={stagger}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
-          className="max-w-md"
+          className="max-w-xl"
         >
-          <motion.p variants={fadeUp} className="label mb-5">
+          <motion.p variants={fadeUp} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-stone/25 font-sans text-xs font-medium uppercase tracking-ticker text-stone mb-6">
             Brand Partner
           </motion.p>
           <a href={`/brands/${brand.id}`} className="block group/heading">
             <motion.h2
               variants={fadeUp}
-              className="font-display text-4xl md:text-6xl lg:text-7xl leading-none text-charcoal mb-4 transition-colors duration-400 group-hover/heading:text-gold"
+              className="font-display text-4xl md:text-6xl lg:text-7xl leading-[1.05] text-charcoal mb-4 transition-colors duration-400 group-hover/heading:text-gold"
             >
               {brand.name}
             </motion.h2>
@@ -467,7 +469,7 @@ function BrandShowcase({ brands }: { brands: Brand[] }) {
       </div>
 
       {/* Brand strips */}
-      <div className="border-t border-stone/10">
+      <div className="border-t border-stone/10 space-y-2 pt-6 pb-10 px-4 sm:px-6 lg:px-12">
         {brands.map((brand, i) => (
           <BrandStrip key={brand.id} brand={brand} index={i} />
         ))}
@@ -1193,6 +1195,8 @@ function Footer({ brands }: { brands: Brand[] }) {
                   </a>
                 </p>
               ))}
+              <p><a href="/privacy-policy" className="font-sans text-sm text-stone/70 hover:text-gold transition-colors duration-400">Privacy Policy</a></p>
+              <p><a href="/terms-of-use" className="font-sans text-sm text-stone/70 hover:text-gold transition-colors duration-400">Terms of Use</a></p>
             </div>
           </div>
         </div>
@@ -1204,9 +1208,11 @@ function Footer({ brands }: { brands: Brand[] }) {
           <p className="font-sans text-xs text-stone/50 text-center">
             © {new Date().getFullYear()} AP Sanitations, Indore. All rights reserved.
           </p>
-          {/* <p className="font-sans text-xs text-stone/30">
-            Crafted with care.
-          </p> */}
+          <p className="font-sans text-xs text-stone/30 text-center flex items-center gap-3">
+            <a href="/privacy-policy" className="hover:text-gold transition-colors duration-400">Privacy Policy</a>
+            <span>·</span>
+            <a href="/terms-of-use" className="hover:text-gold transition-colors duration-400">Terms of Use</a>
+          </p>
         </div>
       </div>
     </footer>

@@ -27,8 +27,15 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   }
 }
 
-export default async function ProductCategoryPage({ params }: { params: Promise<{ category: string }> }) {
+export default async function ProductCategoryPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ category: string }>
+  searchParams: Promise<{ series?: string }>
+}) {
   const { category } = await params
+  const { series: selectedSeries } = await searchParams
   const [products, models, allBrands] = await Promise.all([
     getProducts(),
     getProductModelsByCategory(category),
@@ -110,6 +117,8 @@ export default async function ProductCategoryPage({ params }: { params: Promise<
             allBrands={allBrands}
             productTitle={product.title}
             waUrl={waUrl}
+            category={category}
+            selectedSeries={selectedSeries}
           />
         : <PaginatedProductGrid
             models={models}
