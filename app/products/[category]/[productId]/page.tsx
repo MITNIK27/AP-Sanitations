@@ -7,7 +7,7 @@ import { buildWhatsAppUrl } from '../../../../lib/whatsapp'
 import { CATEGORY_LABELS } from '../../../../lib/categoryLabels'
 import { PRODUCT_IMAGES } from '../../../../lib/productImages'
 import { PRODUCT_GALLERIES } from '../../../../lib/productGalleries'
-import { PRODUCT_IMAGE_CONTAIN } from '../../../../lib/productImageFit'
+import { shouldContain } from '../../../../lib/productImageFit'
 import { ImageCarousel } from './ImageCarousel'
 import { APLogo } from '../../../../components/APLogo'
 
@@ -68,7 +68,7 @@ export default async function ProductDetailPage({
     : (staticGallery ?? [])
   const staticImageSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
   const effectiveImageSrc = staticImageSrc ?? model.imageSrc
-  const heroObjectFit: 'cover' | 'contain' = (staticGallery || staticImageSrc || PRODUCT_IMAGE_CONTAIN.has(model._id)) ? 'contain' : 'cover'
+  const heroObjectFit: 'cover' | 'contain' = (staticGallery || staticImageSrc || shouldContain(model._id)) ? 'contain' : 'cover'
 
   return (
     <main className="min-h-screen bg-cream text-charcoal">

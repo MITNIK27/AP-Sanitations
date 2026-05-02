@@ -8,7 +8,7 @@ import type { Brand } from '../../../data/brands'
 import { buildWhatsAppUrl } from '../../../lib/whatsapp'
 import { BRAND_LOGOS } from '../../../lib/brandLogos'
 import { PRODUCT_IMAGES } from '../../../lib/productImages'
-import { PRODUCT_IMAGE_CONTAIN } from '../../../lib/productImageFit'
+import { shouldContain } from '../../../lib/productImageFit'
 
 interface Props {
   models: ProductModel[]
@@ -84,7 +84,7 @@ export function PaginatedProductGrid({ models, allBrands, pageSize, productTitle
           const brandCatalogueUrl = allBrands.find((b) => b.id === model.brandId)?.catalogueUrl
           const staticSrc = PRODUCT_IMAGES[model._id] ?? PRODUCT_IMAGES[model.name]
           const effectiveSrc = staticSrc ?? model.imageSrc
-          const useContain = staticSrc != null || PRODUCT_IMAGE_CONTAIN.has(model._id)
+          const useContain = staticSrc != null || shouldContain(model._id)
           const detailHref = backPath
             ? `/products/${model.category}/${model._id}?back=${encodeURIComponent(backPath)}`
             : `/products/${model.category}/${model._id}`

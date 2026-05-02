@@ -17,3 +17,14 @@ export const PRODUCT_IMAGE_CONTAIN = new Set([
   'productModel-pnb-kitchenmate-6',
   'productModel-pnb-kitchenmate-7',
 ])
+
+// Brand prefixes where all products use object-contain.
+// Morzze images are 1200×1200 square studio shots on plain backgrounds.
+export const PRODUCT_IMAGE_CONTAIN_PREFIXES: string[] = [
+  'productModel-morzze-',
+]
+
+export function shouldContain(id: string): boolean {
+  if (PRODUCT_IMAGE_CONTAIN.has(id)) return true
+  return PRODUCT_IMAGE_CONTAIN_PREFIXES.some((prefix) => id.startsWith(prefix))
+}
