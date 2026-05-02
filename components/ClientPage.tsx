@@ -382,7 +382,7 @@ function BrandStrip({
             /* Contained image (e.g. PNB) — centred with padding, not stretched */
             <Image
               src={brand.imageSrc}
-              alt={brand.imageAlt}
+              alt={brand.imageAlt ?? brand.name}
               width={480}
               height={600}
               className="relative w-full h-auto max-h-[60vh] object-contain transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
@@ -391,7 +391,7 @@ function BrandStrip({
             /* Cover image (e.g. Anupam, Sofpour) */
             <Image
               src={brand.imageSrc}
-              alt={brand.imageAlt}
+              alt={brand.imageAlt ?? brand.name}
               fill
               sizes="(max-width: 768px) 100vw, 40vw"
               className="object-cover transition-transform duration-800 ease-luxury group-hover:scale-[1.02]"
